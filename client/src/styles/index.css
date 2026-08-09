@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS — REo Collection
+   All brand colors, spacing, typography as CSS custom properties
+   ============================================================ */
+:root {
+  /* Brand Colors */
+  --color-white: #FFFFFF;
+  --color-bg-soft: #F7F7F6;
+  --color-text-primary: #111111;
+  --color-text-secondary: #5F5F5F;
+  --color-border: #E5E5E3;
+  --color-brand-beige: #C9AD8B;
+  --color-brand-beige-dark: #A98C6C;
+  --color-accent-lime: #D9E82B;
+
+  /* Surface Colors */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F7F7F6;
+  --color-surface-muted: #FAFAFA;
+
+  /* Status Colors */
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
+  /* Typography */
+  --font-primary: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-secondary: 'Inter', system-ui, sans-serif;
+
+  /* Spacing */
+  --header-height: 64px;
+  --header-height-mobile: 56px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+}
+
+/* ============================================================
+   TAILWIND THEME EXTENSION
+   ============================================================ */
+@theme {
+  /* Colors */
+  --color-brand-beige: #C9AD8B;
+  --color-brand-beige-dark: #A98C6C;
+  --color-accent-lime: #D9E82B;
+  --color-bg-soft: #F7F7F6;
+  --color-text-primary: #111111;
+  --color-text-secondary: #5F5F5F;
+  --color-border-base: #E5E5E3;
+
+  /* Font Family */
+  --font-family-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-family-body: 'Inter', system-ui, sans-serif;
+
+  /* Screen breakpoints */
+  --breakpoint-xs: 375px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+}
+
+/* ============================================================
+   BASE RESETS & GLOBAL STYLES
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-beige);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-beige-dark);
+}
+
+/* ============================================================
+   FOCUS STYLES — Accessibility
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--color-brand-beige);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   SELECTION
+   ============================================================ */
+::selection {
+  background-color: var(--color-brand-beige);
+  color: var(--color-white);
+}
+
+/* ============================================================
+   LINKS
+   ============================================================ */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================================
+   IMAGES
+   ============================================================ */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================================
+   SKELETON SHIMMER ANIMATION
+   ============================================================ */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   SWIPER OVERRIDES
+   ============================================================ */
+.swiper-pagination-bullet {
+  background: var(--color-brand-beige) !important;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1 !important;
+  background: var(--color-brand-beige) !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--color-text-primary) !important;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* ============================================================
+   PAGE TRANSITION
+   ============================================================ */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
