@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Heart } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import EmptyState from '@/components/ui/EmptyState'
 import Button from '@/components/ui/Button'
-import { Heart } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useWishlist } from '@/hooks/useWishlist'
-import { ROUTES } from '@/constants/routes'
 
 export default function WishlistPage() {
   const { count } = useWishlist()
@@ -14,10 +13,9 @@ export default function WishlistPage() {
     document.title = `Wishlist — REo Collection`
   }, [])
 
-  if (count === 0) {
-    return (
-      <Container className="py-16">
-      <Container className="py-20">
+  return (
+    <Container className="py-20 min-h-[60vh]">
+      {count === 0 ? (
         <EmptyState
           icon={<Heart className="h-12 w-12 text-[#C9AD8B]" />}
           title="Your wishlist is empty"
@@ -28,21 +26,15 @@ export default function WishlistPage() {
             </Link>
           }
         />
-      </Container>
-    )
-  }
-
-  return (
-    <div className="bg-[#F7F7F6] py-10 min-h-screen">
-      <Container>
-        <SectionHeading 
-          title="Your Wishlist" 
-          subtitle={`${products.length} item${products.length !== 1 ? 's' : ''} saved`}
-          className="mb-8" 
-        />
-        
-        <ProductGrid products={products} columns="four" />
-      </Container>
-    </div>
+      ) : (
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-bold text-[#111111] mb-2">Your Wishlist</h2>
+          <p className="text-[#5F5F5F] mb-6">You have {count} items in your wishlist.</p>
+          <Link to="/account/wishlist">
+            <Button>View Full Wishlist</Button>
+          </Link>
+        </div>
+      )}
+    </Container>
   )
 }
