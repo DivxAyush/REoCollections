@@ -56,7 +56,7 @@ export default function AdminAddProductPage() {
       const data = await api.post(API_ENDPOINTS.UPLOAD, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-      return data.url
+      return { url: data.url, publicId: data.publicId }
     } catch (err) {
       throw new Error('Image upload failed')
     } finally {
@@ -75,8 +75,8 @@ export default function AdminAddProductPage() {
       
       // Upload image if selected
       if (imageFile) {
-        const url = await handleUploadImage()
-        if (url) imageUrls.push(url)
+        const imageObj = await handleUploadImage()
+        if (imageObj) imageUrls.push(imageObj)
       } else {
         throw new Error('Please select at least one image')
       }

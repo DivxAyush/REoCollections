@@ -1,4 +1,6 @@
 import Product from '../models/Product.js'
+import Category from '../models/Category.js'
+import mongoose from 'mongoose'
 import { asyncHandler, AppError } from '../middleware/errorHandler.js'
 
 const DEFAULT_PAGE_SIZE = 12
@@ -195,6 +197,17 @@ export const createProduct = asyncHandler(async (req, res) => {
     newArrival,
   } = req.body
 
+  // Handle Category ID or Slug
+  let categoryId = category
+  if (!mongoose.Types.ObjectId.isValid(category)) {
+    // If it's not a valid ID, assume it's a slug and look it up
+    const foundCategory = await Category.findOne({ slug: category })
+    if (!foundCategory) {
+      throw new AppError(`Category with slug '${category}' not found`, 404)
+    }
+    categoryId = foundCategory._id
+  }
+
   // Basic slug generation
   const slug = name
     .toLowerCase()
@@ -208,7 +221,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     shortDescription,
     price,
     compareAtPrice,
-    category,
+    category: categoryId,
     images,
     sku,
     stock,
