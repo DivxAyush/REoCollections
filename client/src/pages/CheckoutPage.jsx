@@ -52,6 +52,9 @@ export default function CheckoutPage() {
     setLoading(true)
 
     try {
+      // Ensure backend cart is synced with frontend cart before creating order
+      await api.post('/cart', { items })
+
       if (paymentMethod === 'cod') {
         const data = await api.post(API_ENDPOINTS.ORDERS.CREATE, {
           shippingAddress,
