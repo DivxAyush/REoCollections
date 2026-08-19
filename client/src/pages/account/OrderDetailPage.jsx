@@ -4,52 +4,67 @@ import { ArrowLeft, Package, Truck, CheckCircle2, XCircle, AlertCircle } from 'l
 import Button from '@/components/ui/Button'
 import PriceDisplay from '@/components/ui/PriceDisplay'
 import { cn } from '@/utils/cn'
+import api from '@/services/apiClient'
+import { API_ENDPOINTS } from '@/constants/api'
 
 export default function OrderDetailPage() {
   const { id } = useParams()
-  const [orderStatus, setOrderStatus] = useState('Processing') // Processing, Shipped, Delivered, Cancelled
+  const [order, setOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [cancelling, setCancelling] = useState(false)
   
   useEffect(() => {
-    document.title = `Order #${id} — REo Collection`
+    document.title = `Order Details — REo Collection`
+    fetchOrderDetails()
   }, [id])
 
-  // Mock order data
-  const mockOrder = {
-    id: id,
-    date: 'Aug 9, 2026',
-    total: 3499,
-    items: [
-      {
-        id: 'p1',
-        name: 'Premium Leather Loafers',
-        price: 3499,
-        quantity: 1,
-        image: 'https://images.unsplash.com/photo-1499013819532-e4ff41b00669?q=80&w=500&auto=format&fit=crop',
-        size: 'UK 9'
+  const fetchOrderDetails = async () => {
+    try {
+      const data = await api.get(API_ENDPOINTS.ORDERS.DETAIL(id))
+      if (data.success) {
+        setOrder(data.order)
       }
-    ],
-    address: {
-      name: 'Ayush Kumar',
-      street: '123 Fashion Street',
-      city: 'Mumbai, Maharashtra',
-      pincode: '400001',
-      phone: '+91 98765 43210'
-    },
-    payment: 'Credit Card ending in 4242'
-  }
-
-  const handleCancelOrder = () => {
-    if (window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
-      setOrderStatus('Cancelled')
+    } catch (err) {
+      console.error('Failed to fetch order', err)
+    } finally {
+      setLoading(false)
     }
   }
 
+  const handleCancelOrder = async () => {
+    if (window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+      setCancelling(true)
+      try {
+        const data = await api.post(API_ENDPOINTS.ORDERS.CANCEL(id))
+        if (data.success) {
+          alert('Order cancelled successfully')
+          fetchOrderDetails()
+        }
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to cancel order')
+      } finally {
+        setCancelling(false)
+      }
+    }
+  }
+
+  if (loading) {
+    return <div className="p-10 text-center">Loading order details...</div>
+  }
+
+  if (!order) {
+    return <div className="p-10 text-center">Order not found</div>
+  }
+
+  const orderStatus = order.status
+  const isCancelled = orderStatus === 'cancelled'
+
   // Timeline UI Data
   const timelineSteps = [
-    { title: 'Order Placed', date: 'Aug 9, 10:00 AM', completed: true, icon: Package },
-    { title: 'Processing', date: 'Aug 9, 11:30 AM', completed: orderStatus !== 'Cancelled', icon: AlertCircle },
-    { title: 'Shipped', date: 'Est. Aug 10', completed: orderStatus === 'Shipped' || orderStatus === 'Delivered', icon: Truck },
-    { title: 'Delivered', date: 'Est. Aug 12', completed: orderStatus === 'Delivered', icon: CheckCircle2 }
+    { title: 'Order Placed', date: new Date(order.createdAt).toLocaleDateString(), completed: true, icon: Package },
+    { title: 'Processing', date: '', completed: !isCancelled && orderStatus !== 'pending', icon: AlertCircle },
+    { title: 'Shipped', date: order.trackingNumber ? `Track: ${order.trackingNumber}` : '', completed: !isCancelled && (orderStatus === 'shipped' || orderStatus === 'out_for_delivery' || orderStatus === 'delivered'), icon: Truck },
+    { title: 'Delivered', date: order.deliveredAt ? new Date(order.deliveredAt).toLocaleDateString() : '', completed: orderStatus === 'delivered', icon: CheckCircle2 }
   ]
 
   return (
@@ -61,27 +76,27 @@ export default function OrderDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-[#111111]">Order #{id}</h1>
-            <p className="text-sm text-[#5F5F5F]">Placed on {mockOrder.date}</p>
+            <h1 className="text-2xl font-bold text-[#111111]">Order #{order.orderNumber}</h1>
+            <p className="text-sm text-[#5F5F5F]">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
         
         <div className={cn(
           "px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider",
-          orderStatus === 'Cancelled' ? "bg-red-100 text-red-600" :
-          orderStatus === 'Delivered' ? "bg-green-100 text-green-600" :
+          isCancelled ? "bg-red-100 text-red-600" :
+          orderStatus === 'delivered' ? "bg-green-100 text-green-600" :
           "bg-blue-100 text-blue-600"
         )}>
-          {orderStatus}
+          {orderStatus.replace('_', ' ')}
         </div>
       </div>
 
-      {orderStatus === 'Cancelled' && (
+      {isCancelled && (
         <div className="rounded-lg bg-red-50 p-4 border border-red-200 flex items-start gap-3">
           <XCircle className="h-5 w-5 text-red-500 mt-0.5" />
           <div>
             <h3 className="font-semibold text-red-800">Order Cancelled</h3>
-            <p className="text-sm text-red-600 mt-1">This order was cancelled by you. If you paid online, your refund will be processed within 5-7 business days.</p>
+            <p className="text-sm text-red-600 mt-1">This order was cancelled. If you paid online, your refund will be processed according to our policy.</p>
           </div>
         </div>
       )}
@@ -90,15 +105,19 @@ export default function OrderDetailPage() {
         <div className="lg:col-span-2 flex flex-col gap-8">
           
           {/* Tracking Timeline */}
-          {orderStatus !== 'Cancelled' && (
-            <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm">
+          {!isCancelled && (
+            <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm overflow-hidden overflow-x-auto">
               <h2 className="text-lg font-bold text-[#111111] mb-6">Delivery Status</h2>
-              <div className="relative flex justify-between">
+              <div className="relative flex justify-between min-w-[500px]">
                 {/* Connecting Line */}
                 <div className="absolute top-5 left-0 w-full h-1 bg-[#F7F7F6] -z-10" />
                 <div 
                   className="absolute top-5 left-0 h-1 bg-green-500 -z-10 transition-all duration-500" 
-                  style={{ width: '33%' }} 
+                  style={{ 
+                    width: orderStatus === 'delivered' ? '100%' : 
+                           (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? '66%' : 
+                           (orderStatus === 'processing' || orderStatus === 'confirmed') ? '33%' : '0%' 
+                  }} 
                 />
 
                 {timelineSteps.map((step, index) => {
@@ -113,7 +132,7 @@ export default function OrderDetailPage() {
                       </div>
                       <div className="text-center">
                         <div className={cn("text-xs font-bold", step.completed ? "text-[#111111]" : "text-[#5F5F5F]")}>{step.title}</div>
-                        <div className="text-[10px] text-[#5F5F5F] mt-1">{step.date}</div>
+                        {step.date && <div className="text-[10px] text-[#5F5F5F] mt-1 break-words px-2">{step.date}</div>}
                       </div>
                     </div>
                   )
@@ -124,16 +143,19 @@ export default function OrderDetailPage() {
 
           {/* Ordered Items */}
           <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#111111] mb-4">Items Ordered</h2>
+            <h2 className="text-lg font-bold text-[#111111] mb-4">Items Ordered ({order.items.length})</h2>
             <div className="flex flex-col gap-4">
-              {mockOrder.items.map(item => (
-                <div key={item.id} className="flex gap-4 items-center">
-                  <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-[#F7F7F6]">
-                    <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+              {order.items.map(item => (
+                <div key={item._id || item.product} className="flex gap-4 items-center">
+                  <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-[#F7F7F6] border">
+                    {item.image ? <img src={item.image} alt={item.name} className="h-full w-full object-cover" /> : null}
                   </div>
                   <div className="flex flex-1 flex-col">
                     <span className="font-semibold text-sm text-[#111111]">{item.name}</span>
-                    <span className="text-xs text-[#5F5F5F] mt-1">Size: {item.size}</span>
+                    <span className="text-xs text-[#5F5F5F] mt-1">
+                      {item.size && `Size: ${item.size} `}
+                      {item.color && `| Color: ${item.color}`}
+                    </span>
                   </div>
                   <div className="text-right">
                     <PriceDisplay price={item.price} className="text-sm font-semibold" />
@@ -152,16 +174,18 @@ export default function OrderDetailPage() {
             <div className="flex flex-col gap-3 text-sm text-[#5F5F5F]">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>₹{mockOrder.total.toLocaleString('en-IN')}</span>
+                <span>₹{order.subtotal?.toLocaleString('en-IN') || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="text-green-600">Free</span>
+                <span className={order.deliveryCharge === 0 ? "text-green-600" : ""}>
+                  {order.deliveryCharge === 0 ? 'Free' : `₹${order.deliveryCharge}`}
+                </span>
               </div>
               <div className="my-2 h-px w-full bg-[#E5E5E3]" />
               <div className="flex justify-between text-base font-bold text-[#111111]">
                 <span>Total</span>
-                <span>₹{mockOrder.total.toLocaleString('en-IN')}</span>
+                <span>₹{order.total?.toLocaleString('en-IN') || 0}</span>
               </div>
             </div>
           </div>
@@ -169,23 +193,32 @@ export default function OrderDetailPage() {
           <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm">
             <h2 className="text-sm font-bold text-[#111111] mb-2 uppercase tracking-wider">Shipping Address</h2>
             <div className="text-sm text-[#5F5F5F] leading-relaxed">
-              <p className="font-semibold text-[#111111] mb-1">{mockOrder.address.name}</p>
-              <p>{mockOrder.address.street}</p>
-              <p>{mockOrder.address.city} - {mockOrder.address.pincode}</p>
-              <p className="mt-2">Phone: {mockOrder.address.phone}</p>
+              <p className="font-semibold text-[#111111] mb-1">{order.shippingAddress?.name || 'Guest'}</p>
+              <p>{order.shippingAddress?.line1}</p>
+              {order.shippingAddress?.line2 && <p>{order.shippingAddress?.line2}</p>}
+              <p>{order.shippingAddress?.city} - {order.shippingAddress?.pincode}</p>
+              <p>{order.shippingAddress?.state}</p>
+              <p className="mt-2">Phone: {order.shippingAddress?.phone}</p>
             </div>
 
             <div className="my-4 h-px w-full bg-[#E5E5E3]" />
 
             <h2 className="text-sm font-bold text-[#111111] mb-2 uppercase tracking-wider">Payment Method</h2>
             <div className="text-sm text-[#5F5F5F]">
-              <p>{mockOrder.payment}</p>
+              <p className="uppercase">{order.payment?.method || 'cod'}</p>
+              <p>Status: <span className={order.payment?.status === 'paid' ? "text-green-600 font-medium" : "text-orange-600 font-medium"}>{order.payment?.status}</span></p>
+              {order.payment?.transactionId && <p className="text-xs text-gray-400 truncate mt-1">ID: {order.payment.transactionId}</p>}
             </div>
           </div>
 
-          {orderStatus === 'Processing' && (
-            <Button variant="outline" className="w-full text-red-600 border-red-200 hover:bg-red-50" onClick={handleCancelOrder}>
-              Cancel Order
+          {(orderStatus === 'pending' || orderStatus === 'processing') && (
+            <Button 
+              variant="outline" 
+              className="w-full text-red-600 border-red-200 hover:bg-red-50" 
+              onClick={handleCancelOrder}
+              disabled={cancelling}
+            >
+              {cancelling ? 'Cancelling...' : 'Cancel Order'}
             </Button>
           )}
         </div>
