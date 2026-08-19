@@ -21,6 +21,11 @@ router.use('/orders', orderRoutes)
 router.use('/users', userRoutes)
 router.use('/upload', uploadRoutes)
 
+// Health check endpoint for Render cron
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' })
+})
+
 // Fallback for API routes
 router.use('*', (req, res) => {
   res.status(404).json({ success: false, message: 'API Route Not Found' })
