@@ -176,3 +176,45 @@ export const searchProducts = asyncHandler(async (req, res) => {
     query: q,
   })
 })
+
+// ============================================================
+// POST /api/products
+// ============================================================
+export const createProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    description,
+    shortDescription,
+    price,
+    compareAtPrice,
+    category,
+    images,
+    sku,
+    stock,
+    featured,
+    newArrival,
+  } = req.body
+
+  // Basic slug generation
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '') + '-' + Date.now().toString().slice(-4)
+
+  const product = await Product.create({
+    name,
+    slug,
+    description,
+    shortDescription,
+    price,
+    compareAtPrice,
+    category,
+    images,
+    sku,
+    stock,
+    featured,
+    newArrival,
+  })
+
+  res.status(201).json({ success: true, product })
+})

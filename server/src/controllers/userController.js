@@ -135,3 +135,19 @@ export const setDefaultAddress = asyncHandler(async (req, res) => {
     addresses: user.addresses,
   })
 })
+
+// ============================================================
+// GET /api/users/all (ADMIN ONLY)
+// ============================================================
+export const getAllUsers = asyncHandler(async (req, res) => {
+  // Exclude password and sensitive reset tokens
+  const users = await User.find({})
+    .select('-password -resetPasswordToken -resetPasswordExpires')
+    .sort({ createdAt: -1 })
+    .lean()
+
+  res.json({
+    success: true,
+    users,
+  })
+})

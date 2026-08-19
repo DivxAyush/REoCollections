@@ -6,11 +6,15 @@ import {
   getNewArrivals,
   getBestSellers,
   searchProducts,
+  createProduct,
 } from '../controllers/productController.js'
+import { protect } from '../middleware/auth.js'
+import { adminOnly } from '../middleware/adminOnly.js'
 
 const router = Router()
 
 router.get('/', getProducts)
+router.post('/', protect, adminOnly, createProduct)
 router.get('/search', searchProducts)
 router.get('/featured', getFeatured)
 router.get('/new-arrivals', getNewArrivals)

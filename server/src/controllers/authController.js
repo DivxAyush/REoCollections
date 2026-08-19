@@ -105,3 +105,34 @@ export const resetPassword = asyncHandler(async (req, res) => {
   // TODO: Implement token verification and password update (Phase 5)
   res.json({ success: true, message: 'Password reset successfully' })
 })
+
+// ============================================================
+// POST /api/auth/register-admin-secret (TEMPORARY SETUP ROUTE)
+// ============================================================
+export const registerAdminSecret = asyncHandler(async (req, res) => {
+  const { secretKey, name, email, password } = req.body
+
+  // Only allow if the secret key matches
+  if (secretKey !== 'REO_ADMIN_SETUP_2026') {
+    throw new AppError('Unauthorized', 401)
+  }
+
+  const existingUser = await User.findOne({ email: email.toLowerCase() })
+  if (existingUser) {
+    return res.json({ success: true, message: 'Admin account already exists', user: existingUser.toSafeObject() })
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: 'admin',
+    isActive: true,
+  })
+
+  res.status(201).json({
+    success: true,
+    message: 'Admin account created successfully',
+    user: user.toSafeObject(),
+  })
+})

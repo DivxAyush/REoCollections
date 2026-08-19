@@ -76,4 +76,13 @@ export const API_ENDPOINTS = {
     LIST: (productId) => `/products/${productId}/reviews`,
     CREATE: (productId) => `/products/${productId}/reviews`,
   },
+
+  // Admin
+  ADMIN: {
+    USERS: '/users/all',
+    CREATE_PRODUCT: '/products',
+  },
+
+  // Upload
+  UPLOAD: '/upload',
 }

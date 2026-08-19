@@ -51,6 +51,11 @@ const LazyShippingPolicyPage = lazy(() => import('@/pages/policies/PolicyPages')
 const LazyReturnPolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.ReturnPolicyPage })))
 const LazyCookiePolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.CookiePolicyPage })))
 
+// Admin
+const AdminLayout = lazy(() => import('@/layouts/AdminLayout'))
+const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'))
+const AdminAddProductPage = lazy(() => import('@/pages/admin/AdminAddProductPage'))
+
 // ============================================================
 // ROUTES
 // ============================================================
@@ -59,6 +64,12 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
+        {/* Admin Routes */}
+        <Route path="admin-ayush2133k" element={<AdminLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="add-product" element={<AdminAddProductPage />} />
+        </Route>
+
         {/* Public routes with main layout */}
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />

@@ -6,6 +6,7 @@ import cartRoutes from './cartRoutes.js'
 import wishlistRoutes from './wishlistRoutes.js'
 import orderRoutes from './orderRoutes.js'
 import userRoutes from './userRoutes.js'
+import uploadRoutes from './uploadRoutes.js'
 
 const router = Router()
 
@@ -16,6 +17,7 @@ router.use('/cart', cartRoutes)
 router.use('/wishlist', wishlistRoutes)
 router.use('/orders', orderRoutes)
 router.use('/users', userRoutes)
+router.use('/upload', uploadRoutes)
 
 // Fallback for API routes
 router.use('*', (req, res) => {
