@@ -116,7 +116,7 @@ const productSchema = new mongoose.Schema(
 // ============================================================
 // INDEXES
 // ============================================================
-productSchema.index({ slug: 1 })
+
 productSchema.index({ category: 1, isActive: 1 })
 productSchema.index({ featured: 1, isActive: 1 })
 productSchema.index({ newArrival: 1, isActive: 1 })
