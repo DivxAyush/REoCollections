@@ -14,11 +14,12 @@ export default function AddressesPage() {
   const [editingId, setEditingId] = useState(null)
   
   const [formData, setFormData] = useState({
-    street: '',
+    name: '',
+    phone: '',
+    line1: '',
     city: '',
     state: '',
-    postalCode: '',
-    country: 'India',
+    pincode: '',
     isDefault: false
   })
 
@@ -45,16 +46,17 @@ export default function AddressesPage() {
     if (address) {
       setEditingId(address._id)
       setFormData({
-        street: address.street,
-        city: address.city,
-        state: address.state,
-        postalCode: address.postalCode,
-        country: address.country,
-        isDefault: address.isDefault
+        name: address.name || '',
+        phone: address.phone || '',
+        line1: address.line1 || '',
+        city: address.city || '',
+        state: address.state || '',
+        pincode: address.pincode || '',
+        isDefault: address.isDefault || false
       })
     } else {
       setEditingId(null)
-      setFormData({ street: '', city: '', state: '', postalCode: '', country: 'India', isDefault: addresses.length === 0 })
+      setFormData({ name: '', phone: '', line1: '', city: '', state: '', pincode: '', isDefault: addresses.length === 0 })
     }
     setIsModalOpen(true)
   }
@@ -136,9 +138,10 @@ export default function AddressesPage() {
                 </span>
               )}
               <div className="mt-1 space-y-1 text-sm text-[#5F5F5F] pr-20">
-                <p className="font-medium text-[#111111]">{addr.street}</p>
-                <p>{addr.city}, {addr.state} {addr.postalCode}</p>
-                <p>{addr.country}</p>
+                <p className="font-medium text-[#111111]">{addr.name}</p>
+                <p>{addr.line1}</p>
+                <p>{addr.city}, {addr.state} {addr.pincode}</p>
+                <p>Phone: {addr.phone}</p>
               </div>
               <div className="mt-4 pt-4 border-t flex gap-3">
                 <button onClick={() => handleOpenModal(addr)} className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
@@ -166,14 +169,17 @@ export default function AddressesPage() {
               <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <Input label="Street Address" name="street" value={formData.street} onChange={handleChange} required placeholder="123 Main St" />
+              <div className="grid grid-cols-2 gap-4">
+                <Input label="Full Name" name="name" value={formData.name} onChange={handleChange} required />
+                <Input label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} required />
+              </div>
+              <Input label="Street Address" name="line1" value={formData.line1} onChange={handleChange} required placeholder="123 Main St" />
               <div className="grid grid-cols-2 gap-4">
                 <Input label="City" name="city" value={formData.city} onChange={handleChange} required />
                 <Input label="State" name="state" value={formData.state} onChange={handleChange} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange} required />
-                <Input label="Country" name="country" value={formData.country} onChange={handleChange} required />
+                <Input label="Pincode" name="pincode" value={formData.pincode} onChange={handleChange} required />
               </div>
               <label className="flex items-center gap-2 cursor-pointer pt-2">
                 <input
