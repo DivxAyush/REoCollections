@@ -19,6 +19,12 @@ const CartPage = lazy(() => import('@/pages/CartPage'))
 const WishlistPage = lazy(() => import('@/pages/WishlistPage'))
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'))
 const OrderSuccessPage = lazy(() => import('@/pages/OrderSuccessPage'))
+const ContactPage = lazy(() => import('@/pages/ContactPage'))
+const TrackOrderPage = lazy(() => import('@/pages/TrackOrderPage'))
+
+// Help Pages
+const FaqPage = lazy(() => import('@/pages/help/FaqPage'))
+const SizeGuidePage = lazy(() => import('@/pages/help/SizeGuidePage'))
 
 // Auth
 const LoginPage = lazy(() => import('@/pages/LoginPage'))
@@ -38,6 +44,13 @@ const SettingsPage = lazy(() => import('@/pages/account/SettingsPage'))
 // Utility
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
+// Policies
+const LazyPrivacyPolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.PrivacyPolicyPage })))
+const LazyTermsOfServicePage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.TermsOfServicePage })))
+const LazyShippingPolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.ShippingPolicyPage })))
+const LazyReturnPolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.ReturnPolicyPage })))
+const LazyCookiePolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.CookiePolicyPage })))
+
 // ============================================================
 // ROUTES
 // ============================================================
@@ -55,6 +68,19 @@ export default function AppRoutes() {
           <Route path="search" element={<SearchPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
+
+          {/* Policy Pages */}
+          <Route path="privacy" element={<LazyPrivacyPolicyPage />} />
+          <Route path="terms" element={<LazyTermsOfServicePage />} />
+          <Route path="shipping" element={<LazyShippingPolicyPage />} />
+          <Route path="returns" element={<LazyReturnPolicyPage />} />
+          <Route path="cookies" element={<LazyCookiePolicyPage />} />
+          <Route path="contact" element={<ContactPage />} />
+          <Route path="track-order" element={<TrackOrderPage />} />
+          
+          {/* Help Pages */}
+          <Route path="help/faq" element={<FaqPage />} />
+          <Route path="help/size-guide" element={<SizeGuidePage />} />
 
           {/* Checkout — protected */}
           <Route

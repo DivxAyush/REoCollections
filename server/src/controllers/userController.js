@@ -23,6 +23,17 @@ export const updateProfile = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
+// GET /api/users/addresses
+// ============================================================
+export const getAddresses = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+  res.json({
+    success: true,
+    addresses: user.addresses || [],
+  })
+})
+
+// ============================================================
 // POST /api/users/addresses
 // ============================================================
 export const addAddress = asyncHandler(async (req, res) => {
@@ -98,6 +109,29 @@ export const deleteAddress = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Address deleted',
+    addresses: user.addresses,
+  })
+})
+
+// ============================================================
+// PATCH /api/users/addresses/:id/default
+// ============================================================
+export const setDefaultAddress = asyncHandler(async (req, res) => {
+  const addressId = req.params.id
+  const user = await User.findById(req.user._id)
+
+  const address = user.addresses.id(addressId)
+  if (!address) throw new AppError('Address not found', 404)
+
+  user.addresses.forEach((addr) => {
+    addr.isDefault = addr._id.toString() === addressId
+  })
+
+  await user.save()
+
+  res.json({
+    success: true,
+    message: 'Default address updated',
     addresses: user.addresses,
   })
 })

@@ -14,7 +14,7 @@ const POPULAR_SEARCHES = [
   'Graphic Tees',
   'Polo Shirts',
   'Casual Shirts',
-  'Women Dresses',
+
   'New Arrivals',
 ]
 

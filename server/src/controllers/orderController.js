@@ -121,3 +121,37 @@ export const createOrder = asyncHandler(async (req, res) => {
     order,
   })
 })
+
+// ============================================================
+// POST /api/orders/:id/cancel
+// ============================================================
+export const cancelOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findOne({
+    _id: req.params.id,
+    user: req.user._id,
+  })
+
+  if (!order) {
+    throw new AppError('Order not found', 404)
+  }
+
+  if (order.status !== 'pending' && order.status !== 'processing') {
+    throw new AppError('Order cannot be cancelled at this stage', 400)
+  }
+
+  order.status = 'cancelled'
+  await order.save()
+
+  // Optionally, restore stock here if needed
+  for (const item of order.items) {
+    await Product.findByIdAndUpdate(item.product, {
+      $inc: { stock: item.quantity }
+    })
+  }
+
+  res.json({
+    success: true,
+    message: 'Order cancelled successfully',
+    order
+  })
+})

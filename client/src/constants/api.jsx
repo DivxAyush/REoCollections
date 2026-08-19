@@ -64,11 +64,11 @@ export const API_ENDPOINTS = {
 
   // Addresses
   ADDRESSES: {
-    LIST: '/addresses',
-    CREATE: '/addresses',
-    UPDATE: (id) => `/addresses/${id}`,
-    DELETE: (id) => `/addresses/${id}`,
-    SET_DEFAULT: (id) => `/addresses/${id}/default`,
+    LIST: '/users/addresses',
+    CREATE: '/users/addresses',
+    UPDATE: (id) => `/users/addresses/${id}`,
+    DELETE: (id) => `/users/addresses/${id}`,
+    SET_DEFAULT: (id) => `/users/addresses/${id}/default`,
   },
 
   // Reviews

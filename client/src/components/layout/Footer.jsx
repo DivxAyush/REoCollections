@@ -22,9 +22,8 @@ const footerSections = [
   {
     title: 'Shopping',
     links: [
-      { label: 'Women', href: '/shop/women' },
+
       { label: 'Men', href: '/shop/men' },
-      { label: 'Kids', href: '/shop/kids' },
       { label: 'Footwear', href: '/shop/footwear' },
       { label: 'Accessories', href: '/shop/accessories' },
       { label: 'New Arrivals', href: '/shop/new-arrivals' },
@@ -35,8 +34,7 @@ const footerSections = [
     title: 'Customer Care',
     links: [
       { label: 'My Account', href: '/account' },
-      { label: 'Track Order', href: '/account/orders' },
-      { label: 'Return & Exchange', href: '/help/returns' },
+      { label: 'Track Order', href: '/track-order' },
       { label: 'Size Guide', href: '/help/size-guide' },
       { label: 'FAQ', href: '/help/faq' },
       { label: 'Contact Us', href: '/contact' },
@@ -186,7 +184,7 @@ export default function Footer() {
             </Link>
 
             <p className="mt-3 text-sm leading-relaxed text-[#5F5F5F]">
-              Premium Indian fashion for women, men, and kids. Curated styles, quality fabrics, and an unmatched shopping experience.
+              Premium Indian fashion for men. Curated styles, quality fabrics, and an unmatched shopping experience.
             </p>
 
             {/* Contact */}

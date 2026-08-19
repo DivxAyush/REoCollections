@@ -32,9 +32,53 @@ export const getCart = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
-// POST /api/cart/add
+// POST /api/cart
 // ============================================================
 export const addToCart = asyncHandler(async (req, res) => {
+  // Check if this is a bulk sync
+  if (req.body.items && Array.isArray(req.body.items)) {
+    let cart = await Cart.findOne({ user: req.user._id })
+    if (!cart) {
+      cart = new Cart({ user: req.user._id, items: [] })
+    }
+
+    for (const item of req.body.items) {
+      const product = await Product.findOne({ _id: item.productId, isActive: true })
+      if (!product) continue
+
+      const variantKey = item.variant
+        ? `${item.variant.color || ''}_${item.variant.size || ''}`
+        : 'default'
+
+      const itemIndex = cart.items.findIndex(
+        (i) =>
+          i.product.toString() === item.productId &&
+          i.color === (item.variant?.color || undefined) &&
+          i.size === (item.variant?.size || undefined) &&
+          (item.variant?.variantId ? i.variantId?.toString() === item.variant.variantId : true)
+      )
+
+      if (itemIndex > -1) {
+        const newQuantity = cart.items[itemIndex].quantity + item.quantity
+        cart.items[itemIndex].quantity = Math.min(newQuantity, product.stock)
+        cart.items[itemIndex].priceSnapshot = product.price
+      } else {
+        cart.items.push({
+          product: item.productId,
+          quantity: Math.min(item.quantity, product.stock),
+          color: item.variant?.color,
+          size: item.variant?.size,
+          variantId: item.variant?.variantId,
+          priceSnapshot: product.price,
+        })
+      }
+    }
+    await cart.save()
+    await cart.populate('items.product', 'name slug price images stock isActive')
+    return res.json({ success: true, message: 'Cart synced', cart })
+  }
+
+  // Single item add
   const { productId, quantity = 1, color, size, variantId } = req.body
 
   if (quantity < 1) throw new AppError('Quantity must be at least 1', 400)
@@ -103,10 +147,11 @@ export const addToCart = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
-// PUT /api/cart/update
+// PUT /api/cart/:itemId
 // ============================================================
 export const updateCartItem = asyncHandler(async (req, res) => {
-  const { itemId, quantity } = req.body
+  const itemId = req.params.itemId
+  const { quantity } = req.body
 
   if (quantity < 1) throw new AppError('Quantity must be at least 1', 400)
 
@@ -131,7 +176,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
-// DELETE /api/cart/remove/:itemId
+// DELETE /api/cart/:itemId
 // ============================================================
 export const removeFromCart = asyncHandler(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id })
@@ -149,7 +194,7 @@ export const removeFromCart = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
-// POST /api/cart/clear
+// DELETE /api/cart/clear
 // ============================================================
 export const clearCart = asyncHandler(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id })

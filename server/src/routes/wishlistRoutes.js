@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getWishlist, toggleWishlist } from '../controllers/wishlistController.js'
+import { getWishlist, addToWishlist, removeFromWishlist } from '../controllers/wishlistController.js'
 import { protect } from '../middleware/auth.js'
 
 const router = Router()
@@ -7,6 +7,7 @@ const router = Router()
 router.use(protect)
 
 router.get('/', getWishlist)
-router.post('/toggle', toggleWishlist)
+router.post('/', addToWishlist)
+router.delete('/:productId', removeFromWishlist)
 
 export default router

@@ -33,11 +33,9 @@ async function seed() {
     // 1. Categories
     // ==========================================
     console.log('Seeding Categories...')
-    const [women, men, kids, footwear] = await Category.insertMany([
-      { name: 'Women', slug: 'women', displayOrder: 1 },
-      { name: 'Men', slug: 'men', displayOrder: 2 },
-      { name: 'Kids', slug: 'kids', displayOrder: 3 },
-      { name: 'Footwear', slug: 'footwear', displayOrder: 4 },
+    const [men, footwear] = await Category.insertMany([
+      { name: 'Men', slug: 'men', displayOrder: 1 },
+      { name: 'Footwear', slug: 'footwear', displayOrder: 2 },
     ])
 
     // ==========================================
@@ -72,37 +70,6 @@ async function seed() {
         reviewCount: 124,
       },
       {
-        name: 'Floral Summer Maxi',
-        slug: 'floral-summer-maxi',
-        category: women._id,
-        price: 2499,
-        compareAtPrice: 3299,
-        discount: Math.round(((3299 - 2499) / 3299) * 100),
-        images: [sampleImage],
-        colors: ['Blue', 'Pink'],
-        sizes: ['XS', 'S', 'M', 'L'],
-        stock: 30,
-        featured: true,
-        newArrival: true,
-        rating: 4.5,
-        reviewCount: 45,
-      },
-      {
-        name: 'Kids Graphic Tee',
-        slug: 'kids-graphic-tee',
-        category: kids._id,
-        price: 599,
-        compareAtPrice: 899,
-        discount: Math.round(((899 - 599) / 899) * 100),
-        images: [sampleImage],
-        colors: ['Yellow', 'Red'],
-        sizes: ['2-3Y', '3-4Y', '5-6Y'],
-        stock: 100,
-        bestSeller: true,
-        rating: 4.2,
-        reviewCount: 89,
-      },
-      {
         name: 'Premium Leather Loafers',
         slug: 'premium-leather-loafers',
         category: footwear._id,
@@ -127,7 +94,7 @@ async function seed() {
         title: 'Summer Collection 2026',
         subtitle: 'Breezy styles for sunny days',
         buttonText: 'Shop Now',
-        redirectUrl: '/shop/women',
+        redirectUrl: '/shop/men',
         desktopImage: sampleImage,
         displayOrder: 1,
       },
@@ -157,7 +124,7 @@ async function seed() {
         sectionType: 'category-grid',
         sectionName: 'Shop by Category',
         displayOrder: 2,
-        categoryIds: [women._id, men._id, kids._id, footwear._id],
+        categoryIds: [men._id, footwear._id],
       },
       {
         sectionType: 'product-carousel',

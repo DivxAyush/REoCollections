@@ -17,7 +17,7 @@ export default function WishlistPage() {
     <Container className="py-20 min-h-[60vh]">
       {count === 0 ? (
         <EmptyState
-          icon={<Heart className="h-12 w-12 text-[#C9AD8B]" />}
+          icon={Heart}
           title="Your wishlist is empty"
           description="Save items you love and buy them later."
           action={

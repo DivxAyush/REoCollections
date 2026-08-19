@@ -27,7 +27,7 @@ export default function CartPage() {
       <div className="min-h-screen bg-white">
         <Container className="py-20">
           <EmptyState 
-            icon={<ShoppingBag className="h-12 w-12 text-[#C9AD8B]" />}
+            icon={ShoppingBag}
             title="Your cart is empty"
             description="Looks like you haven't added anything to your cart yet."
             action={

@@ -13,9 +13,9 @@ const router = Router()
 router.use(protect)
 
 router.get('/', getCart)
-router.post('/add', addToCart)
-router.put('/update', updateCartItem)
-router.delete('/remove/:itemId', removeFromCart)
-router.post('/clear', clearCart)
+router.post('/', addToCart)
+router.put('/:itemId', updateCartItem)
+router.delete('/clear', clearCart)
+router.delete('/:itemId', removeFromCart)
 
 export default router

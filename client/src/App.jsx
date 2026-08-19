@@ -5,6 +5,7 @@ import store from '@/redux/store'
 import AppRoutes from '@/routes/AppRoutes'
 import { fetchCurrentUser } from '@/redux/slices/authSlice'
 import { tokenStorage } from '@/utils/tokenStorage'
+import CookieConsent from '@/components/layout/CookieConsent'
 
 // ============================================================
 // AUTH INITIALIZER
@@ -33,6 +34,7 @@ export default function App() {
       <BrowserRouter>
         <AuthInitializer />
         <AppRoutes />
+        <CookieConsent />
       </BrowserRouter>
     </Provider>
   )

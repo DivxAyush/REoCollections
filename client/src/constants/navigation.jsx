@@ -5,17 +5,6 @@
 
 export const NAV_ITEMS = [
   {
-    label: 'Women',
-    href: '/shop/women',
-    subCategories: [
-      { label: 'Tops & T-Shirts', href: '/shop/women/tops' },
-      { label: 'Dresses', href: '/shop/women/dresses' },
-      { label: 'Bottoms', href: '/shop/women/bottoms' },
-      { label: 'Ethnic Wear', href: '/shop/women/ethnic' },
-      { label: 'Outerwear', href: '/shop/women/outerwear' },
-    ],
-  },
-  {
     label: 'Men',
     href: '/shop/men',
     subCategories: [
@@ -27,22 +16,8 @@ export const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Kids',
-    href: '/shop/kids',
-    subCategories: [
-      { label: 'Boys', href: '/shop/kids/boys' },
-      { label: 'Girls', href: '/shop/kids/girls' },
-      { label: 'Infants', href: '/shop/kids/infants' },
-    ],
-  },
-  {
     label: 'Footwear',
     href: '/shop/footwear',
-    subCategories: [],
-  },
-  {
-    label: 'Sleepwear',
-    href: '/shop/sleepwear',
     subCategories: [],
   },
   {
