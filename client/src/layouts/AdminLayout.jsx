@@ -20,6 +20,7 @@ export default function AdminLayout() {
     { name: 'Categories', path: '/admin-ayush2133k/categories', icon: Grid },
     { name: 'Products', path: '/admin-ayush2133k/products', icon: Store },
     { name: 'Add Product', path: '/admin-ayush2133k/add-product', icon: PlusCircle },
+    { name: 'Banners', path: '/admin-ayush2133k/banners', icon: Grid },
   ]
 
   return (

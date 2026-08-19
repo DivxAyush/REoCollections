@@ -60,6 +60,8 @@ const AdminProductsPage = lazy(() => import('@/pages/admin/AdminProductsPage'))
 const AdminEditProductPage = lazy(() => import('@/pages/admin/AdminEditProductPage'))
 const AdminOrdersPage = lazy(() => import('@/pages/admin/AdminOrdersPage'))
 const AdminOrderDetailsPage = lazy(() => import('@/pages/admin/AdminOrderDetailsPage'))
+const AdminBannersPage = lazy(() => import('@/pages/admin/AdminBannersPage'))
+const AdminAddBannerPage = lazy(() => import('@/pages/admin/AdminAddBannerPage'))
 
 // ============================================================
 // ROUTES
@@ -78,6 +80,9 @@ export default function AppRoutes() {
           <Route path="add-product" element={<AdminAddProductPage />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
+          <Route path="banners" element={<AdminBannersPage />} />
+          <Route path="banners/add" element={<AdminAddBannerPage />} />
+          <Route path="banners/edit/:id" element={<AdminAddBannerPage />} />
         </Route>
 
         {/* Public routes with main layout */}

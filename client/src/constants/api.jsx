@@ -95,6 +95,8 @@ export const API_ENDPOINTS = {
     DELETE_CATEGORY: (id) => `/categories/${id}`,
     ORDERS: '/orders/admin/all',
     UPDATE_ORDER_STATUS: (id) => `/orders/admin/${id}/status`,
+    BANNERS: '/banners',
+    BANNER_DETAIL: (id) => `/banners/${id}`,
   },
 
   // Upload

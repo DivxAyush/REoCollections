@@ -9,6 +9,7 @@ import orderRoutes from './orderRoutes.js'
 import userRoutes from './userRoutes.js'
 import uploadRoutes from './uploadRoutes.js'
 import paymentRoutes from './paymentRoutes.js'
+import bannerRoutes from './bannerRoutes.js'
 
 const router = Router()
 
@@ -22,6 +23,7 @@ router.use('/orders', orderRoutes)
 router.use('/users', userRoutes)
 router.use('/upload', uploadRoutes)
 router.use('/payment', paymentRoutes)
+router.use('/banners', bannerRoutes)
 
 // Health check endpoint for Render cron
 router.get('/health', (req, res) => {
