@@ -96,6 +96,24 @@ export const getProductBySlug = asyncHandler(async (req, res) => {
 })
 
 // ============================================================
+// POST /api/products/batch
+// ============================================================
+export const getProductsBatch = asyncHandler(async (req, res) => {
+  const { productIds } = req.body
+  
+  if (!productIds || !Array.isArray(productIds)) {
+    return res.json({ success: true, products: [] })
+  }
+
+  const products = await Product.find({
+    _id: { $in: productIds },
+    isActive: true
+  }).populate('category', 'name slug')
+
+  res.json({ success: true, products })
+})
+
+// ============================================================
 // GET /api/products/featured
 // ============================================================
 export const getFeatured = asyncHandler(async (req, res) => {

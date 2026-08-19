@@ -9,6 +9,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductsBatch,
 } from '../controllers/productController.js'
 import { protect } from '../middleware/auth.js'
 import { adminOnly } from '../middleware/adminOnly.js'
@@ -23,6 +24,7 @@ router.get('/search', searchProducts)
 router.get('/featured', getFeatured)
 router.get('/new-arrivals', getNewArrivals)
 router.get('/best-sellers', getBestSellers)
+router.post('/batch', getProductsBatch)
 router.get('/:slug', getProductBySlug)
 
 export default router

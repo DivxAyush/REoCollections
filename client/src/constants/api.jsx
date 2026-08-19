@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
   // Products
   PRODUCTS: {
     LIST: '/products',
+    BATCH: '/products/batch',
     DETAIL: (slug) => `/products/${slug}`,
     FEATURED: '/products/featured',
     NEW_ARRIVALS: '/products/new-arrivals',
