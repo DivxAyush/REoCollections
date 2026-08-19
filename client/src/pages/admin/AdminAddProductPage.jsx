@@ -53,7 +53,7 @@ export default function AdminAddProductPage() {
     
     try {
       setUploadingImage(true)
-      const { data } = await api.post(API_ENDPOINTS.UPLOAD, formData, {
+      const data = await api.post(API_ENDPOINTS.UPLOAD, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       return data.url
@@ -90,7 +90,7 @@ export default function AdminAddProductPage() {
         images: imageUrls,
       }
 
-      const { data } = await api.post(API_ENDPOINTS.ADMIN.CREATE_PRODUCT, payload)
+      const data = await api.post(API_ENDPOINTS.ADMIN.CREATE_PRODUCT, payload)
       if (data.success) {
         setSuccess(true)
         setTimeout(() => {

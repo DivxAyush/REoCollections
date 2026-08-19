@@ -16,7 +16,7 @@ export default function AdminDashboardPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get(API_ENDPOINTS.ADMIN.USERS)
+      const data = await api.get(API_ENDPOINTS.ADMIN.USERS)
       if (data.success) {
         setUsers(data.users)
       }
