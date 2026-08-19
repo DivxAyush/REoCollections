@@ -34,10 +34,12 @@ export const getMyOrders = asyncHandler(async (req, res) => {
 // GET /api/orders/:id
 // ============================================================
 export const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findOne({
-    _id: req.params.id,
-    user: req.user._id, // Ensure user owns order
-  }).lean()
+  const isObjectId = req.params.id.match(/^[0-9a-fA-F]{24}$/)
+  const query = isObjectId
+    ? { _id: req.params.id, user: req.user._id }
+    : { orderNumber: req.params.id, user: req.user._id }
+
+  const order = await Order.findOne(query).lean()
 
   if (!order) {
     throw new AppError('Order not found', 404)
@@ -126,10 +128,12 @@ export const createOrder = asyncHandler(async (req, res) => {
 // POST /api/orders/:id/cancel
 // ============================================================
 export const cancelOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findOne({
-    _id: req.params.id,
-    user: req.user._id,
-  })
+  const isObjectId = req.params.id.match(/^[0-9a-fA-F]{24}$/)
+  const query = isObjectId
+    ? { _id: req.params.id, user: req.user._id }
+    : { orderNumber: req.params.id, user: req.user._id }
+
+  const order = await Order.findOne(query)
 
   if (!order) {
     throw new AppError('Order not found', 404)
