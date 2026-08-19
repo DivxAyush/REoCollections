@@ -6,7 +6,7 @@ import { PageLoader } from '@/components/ui/Loader'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
-import { ArrowLeft, UploadCloud, X, ImageIcon } from 'lucide-react'
+import { ArrowLeft, UploadCloud, X, ImageIcon, Trash2 } from 'lucide-react'
 
 const BANNER_TYPES = [
   { value: 'hero', label: 'Hero Banner' },
