@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import api from '@/services/apiClient'
 import { API_ENDPOINTS } from '@/constants/api'
 import { PageLoader } from '@/components/ui/Loader'
-import { format } from 'date-fns'
 import { Users, ShieldCheck, Mail, Phone, Calendar } from 'lucide-react'
 
 export default function AdminDashboardPage() {
@@ -133,7 +132,7 @@ export default function AdminDashboardPage() {
                   <td className="px-4 py-3 text-slate-500 whitespace-nowrap">
                     <div className="flex items-center gap-1.5">
                       <Calendar size={14} />
-                      {format(new Date(user.createdAt), 'MMM dd, yyyy')}
+                      {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
                     </div>
                   </td>
                   <td className="px-4 py-3">
