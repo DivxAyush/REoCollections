@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import api from '@/services/apiClient'
 import { API_ENDPOINTS } from '@/constants/api'
 import { UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
 
 export default function AdminAddProductPage() {
   const navigate = useNavigate()
