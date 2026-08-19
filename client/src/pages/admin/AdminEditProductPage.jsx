@@ -1,35 +1,21 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import api from '@/services/apiClient'
 import { API_ENDPOINTS } from '@/constants/api'
 import { UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
-export default function AdminAddProductPage() {
+export default function AdminEditProductPage() {
+  const { id } = useParams()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
-  const [categories, setCategories] = useState([])
   
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await api.get(API_ENDPOINTS.CATEGORIES.LIST)
-        if (data.success) {
-          setCategories(data.categories.filter(c => c.isActive))
-        }
-      } catch (err) {
-        console.error('Failed to load categories', err)
-      }
-    }
-    fetchCategories()
-  }, [])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,6 +29,33 @@ export default function AdminAddProductPage() {
     featured: false,
     newArrival: false,
   })
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await api.get(`/products/${id}`)
+        const product = response.data
+        setFormData({
+          name: product.name,
+          description: product.description,
+          shortDescription: product.shortDescription,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice || '',
+          category: product.category,
+          sku: product.sku,
+          stock: product.stock,
+          featured: product.featured,
+          newArrival: product.newArrival,
+        })
+        if (product.images && product.images.length > 0) {
+          setImagePreview(product.images[0].url)
+        }
+      } catch (err) {
+        setError('Failed to load product details')
+      }
+    }
+    if (id) fetchProduct()
+  }, [id])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -88,24 +101,20 @@ export default function AdminAddProductPage() {
     try {
       let imageUrls = []
       
-      // Upload image if selected
       if (imageFile) {
         const imageObj = await handleUploadImage()
         if (imageObj) imageUrls.push(imageObj)
-      } else {
-        throw new Error('Please select at least one image')
       }
 
-      // Convert numeric fields
       const payload = {
         ...formData,
         price: Number(formData.price),
         compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : undefined,
         stock: Number(formData.stock),
-        images: imageUrls,
+        images: imageUrls.length > 0 ? imageUrls : undefined,
       }
 
-      const data = await api.post(API_ENDPOINTS.ADMIN.CREATE_PRODUCT, payload)
+      const data = await api.put(API_ENDPOINTS.ADMIN.UPDATE_PRODUCT.replace(':id', id), payload)
       if (data.success) {
         setSuccess(true)
         setTimeout(() => {
@@ -113,7 +122,7 @@ export default function AdminAddProductPage() {
         }, 2000)
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to create product')
+      setError(err.response?.data?.message || err.message || 'Failed to update product')
     } finally {
       setLoading(false)
     }
@@ -122,14 +131,14 @@ export default function AdminAddProductPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Add New Product</h1>
-        <p className="text-slate-500 mt-1">Create a new product listing in the store</p>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Edit Product</h1>
+        <p className="text-slate-500 mt-1">Update existing product listing</p>
       </div>
 
       {success && (
         <div className="bg-green-50 text-green-700 p-4 rounded-lg flex items-center gap-3">
           <CheckCircle2 size={20} />
-          <p>Product created successfully! Redirecting...</p>
+          <p>Product updated successfully! Redirecting...</p>
         </div>
       )}
 
@@ -309,9 +318,9 @@ export default function AdminAddProductPage() {
           </Button>
           <Button
             type="submit"
-            disabled={loading || uploadingImage || !imageFile}
+            disabled={loading || uploadingImage}
           >
-            {loading || uploadingImage ? 'Creating...' : 'Create Product'}
+            {loading || uploadingImage ? 'Updating...' : 'Update Product'}
           </Button>
         </div>
 

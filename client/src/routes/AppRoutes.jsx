@@ -55,6 +55,9 @@ const LazyCookiePolicyPage = lazy(() => import('@/pages/policies/PolicyPages').t
 const AdminLayout = lazy(() => import('@/layouts/AdminLayout'))
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'))
 const AdminAddProductPage = lazy(() => import('@/pages/admin/AdminAddProductPage'))
+const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage'))
+const AdminProductsPage = lazy(() => import('@/pages/admin/AdminProductsPage'))
+const AdminEditProductPage = lazy(() => import('@/pages/admin/AdminEditProductPage'))
 
 // ============================================================
 // ROUTES
@@ -67,6 +70,9 @@ export default function AppRoutes() {
         {/* Admin Routes */}
         <Route path="admin-ayush2133k" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="products/edit/:id" element={<AdminEditProductPage />} />
           <Route path="add-product" element={<AdminAddProductPage />} />
         </Route>
 

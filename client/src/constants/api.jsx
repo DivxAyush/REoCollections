@@ -81,6 +81,11 @@ export const API_ENDPOINTS = {
   ADMIN: {
     USERS: '/users/all',
     CREATE_PRODUCT: '/products',
+    UPDATE_PRODUCT: (id) => `/products/${id}`,
+    DELETE_PRODUCT: (id) => `/products/${id}`,
+    CREATE_CATEGORY: '/categories',
+    UPDATE_CATEGORY: (id) => `/categories/${id}`,
+    DELETE_CATEGORY: (id) => `/categories/${id}`,
   },
 
   // Upload

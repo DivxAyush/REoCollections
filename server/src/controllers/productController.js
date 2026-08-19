@@ -231,3 +231,55 @@ export const createProduct = asyncHandler(async (req, res) => {
 
   res.status(201).json({ success: true, product })
 })
+
+// ============================================================
+// PUT /api/products/:id
+// ============================================================
+export const updateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params
+  const updates = req.body
+
+  // If updating category string/slug, resolve to ObjectId
+  if (updates.category && !mongoose.Types.ObjectId.isValid(updates.category)) {
+    const foundCategory = await Category.findOne({ slug: updates.category })
+    if (!foundCategory) {
+      throw new AppError(`Category with slug '${updates.category}' not found`, 404)
+    }
+    updates.category = foundCategory._id
+  }
+
+  // Basic slug generation if name changes
+  if (updates.name) {
+    updates.slug = updates.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '') + '-' + Date.now().toString().slice(-4)
+  }
+
+  const product = await Product.findByIdAndUpdate(id, updates, {
+    new: true,
+    runValidators: true,
+  })
+
+  if (!product) {
+    throw new AppError('Product not found', 404)
+  }
+
+  res.json({ success: true, product })
+})
+
+// ============================================================
+// DELETE /api/products/:id
+// ============================================================
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params
+
+  const product = await Product.findById(id)
+  if (!product) {
+    throw new AppError('Product not found', 404)
+  }
+
+  await product.deleteOne()
+
+  res.json({ success: true, message: 'Product deleted successfully' })
+})
