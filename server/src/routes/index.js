@@ -8,6 +8,7 @@ import wishlistRoutes from './wishlistRoutes.js'
 import orderRoutes from './orderRoutes.js'
 import userRoutes from './userRoutes.js'
 import uploadRoutes from './uploadRoutes.js'
+import paymentRoutes from './paymentRoutes.js'
 
 const router = Router()
 
@@ -20,6 +21,7 @@ router.use('/wishlist', wishlistRoutes)
 router.use('/orders', orderRoutes)
 router.use('/users', userRoutes)
 router.use('/upload', uploadRoutes)
+router.use('/payment', paymentRoutes)
 
 // Health check endpoint for Render cron
 router.get('/health', (req, res) => {

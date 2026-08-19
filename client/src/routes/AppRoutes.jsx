@@ -58,6 +58,8 @@ const AdminAddProductPage = lazy(() => import('@/pages/admin/AdminAddProductPage
 const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage'))
 const AdminProductsPage = lazy(() => import('@/pages/admin/AdminProductsPage'))
 const AdminEditProductPage = lazy(() => import('@/pages/admin/AdminEditProductPage'))
+const AdminOrdersPage = lazy(() => import('@/pages/admin/AdminOrdersPage'))
+const AdminOrderDetailsPage = lazy(() => import('@/pages/admin/AdminOrderDetailsPage'))
 
 // ============================================================
 // ROUTES
@@ -74,6 +76,8 @@ export default function AppRoutes() {
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="products/edit/:id" element={<AdminEditProductPage />} />
           <Route path="add-product" element={<AdminAddProductPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="orders/:id" element={<AdminOrderDetailsPage />} />
         </Route>
 
         {/* Public routes with main layout */}

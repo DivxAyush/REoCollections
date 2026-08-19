@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { clearCart } from '@/redux/slices/cartSlice'
@@ -7,16 +7,123 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import PriceDisplay from '@/components/ui/PriceDisplay'
 import { CheckCircle2, CreditCard, Truck, MapPin } from 'lucide-react'
+import api from '@/services/apiClient'
+import { API_ENDPOINTS } from '@/constants/api'
+import { loadRazorpayScript } from '@/utils/razorpay'
 
 export default function CheckoutPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { items } = useSelector((state) => state.cart)
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+  const deliveryCharge = subtotal > 999 ? 0 : 50
+  const total = subtotal + deliveryCharge
+
+  const [loading, setLoading] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('card')
+  const [shippingAddress, setShippingAddress] = useState({
+    name: '',
+    phone: '',
+    line1: '',
+    city: '',
+    state: '',
+    pincode: '',
+  })
 
   useEffect(() => {
     document.title = 'Secure Checkout — REo Collection'
   }, [])
+
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target
+    setShippingAddress(prev => ({ ...prev, [name]: value }))
+  }
+
+  const validateAddress = () => {
+    return shippingAddress.name && shippingAddress.phone && shippingAddress.line1 && shippingAddress.city && shippingAddress.state && shippingAddress.pincode
+  }
+
+  const handlePlaceOrder = async () => {
+    if (!validateAddress()) {
+      alert('Please fill out all shipping address fields.')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      if (paymentMethod === 'cod') {
+        const data = await api.post(API_ENDPOINTS.ORDERS.CREATE, {
+          shippingAddress,
+          paymentMethod: 'cod'
+        })
+        if (data.success) {
+          dispatch(clearCart())
+          navigate(`/order-success/${data.order.orderNumber}`)
+        }
+      } else {
+        // Razorpay flow
+        const isLoaded = await loadRazorpayScript()
+        if (!isLoaded) {
+          alert('Razorpay SDK failed to load. Are you online?')
+          setLoading(false)
+          return
+        }
+
+        const orderData = await api.post(API_ENDPOINTS.PAYMENT.CREATE_ORDER)
+        if (!orderData.success) {
+          alert('Failed to initialize payment')
+          setLoading(false)
+          return
+        }
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_change_me', 
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: 'REo Collection',
+          description: 'Secure Checkout',
+          order_id: orderData.order_id,
+          handler: async function (response) {
+            try {
+              const verifyData = await api.post(API_ENDPOINTS.PAYMENT.VERIFY, {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                shippingAddress,
+                paymentMethod,
+              })
+              if (verifyData.success) {
+                dispatch(clearCart())
+                navigate(`/order-success/${verifyData.order.orderNumber}`)
+              }
+            } catch (err) {
+              alert(err.response?.data?.message || 'Payment verification failed')
+              setLoading(false)
+            }
+          },
+          prefill: {
+            name: shippingAddress.name,
+            contact: shippingAddress.phone,
+          },
+          theme: { color: '#111111' },
+          modal: {
+            ondismiss: function() { setLoading(false) }
+          }
+        }
+        
+        const rzp = new window.Razorpay(options)
+        rzp.on('payment.failed', function (response){
+          alert('Payment failed: ' + response.error.description)
+          setLoading(false)
+        })
+        rzp.open()
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Something went wrong')
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-[#F7F7F6] py-10 min-h-screen">
@@ -42,16 +149,16 @@ export default function CheckoutPage() {
               </div>
               <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Input label="First Name" placeholder="Ayush" />
-                  <Input label="Last Name" placeholder="Kumar" />
                   <div className="sm:col-span-2">
-                    <Input label="Address" placeholder="123 Fashion Street" />
+                    <Input name="name" value={shippingAddress.name} onChange={handleAddressChange} label="Full Name" placeholder="Ayush Kumar" />
                   </div>
-                  <Input label="City" placeholder="Mumbai" />
-                  <Input label="Postal Code" placeholder="400001" />
                   <div className="sm:col-span-2">
-                    <Input label="Phone Number" placeholder="+91 98765 43210" />
+                    <Input name="line1" value={shippingAddress.line1} onChange={handleAddressChange} label="Address" placeholder="123 Fashion Street" />
                   </div>
+                  <Input name="city" value={shippingAddress.city} onChange={handleAddressChange} label="City" placeholder="Kanpur" />
+                  <Input name="state" value={shippingAddress.state} onChange={handleAddressChange} label="State" placeholder="Uttar Pradesh" />
+                  <Input name="pincode" value={shippingAddress.pincode} onChange={handleAddressChange} label="Postal Code" placeholder="208001" />
+                  <Input name="phone" value={shippingAddress.phone} onChange={handleAddressChange} label="Phone Number" placeholder="+91 98765 43210" />
                 </div>
               </div>
             </section>
@@ -67,29 +174,22 @@ export default function CheckoutPage() {
               <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm">
                 <div className="space-y-4">
                   {/* Card Option */}
-                  <label className="flex cursor-pointer items-start gap-4 rounded-lg border border-[#111111] bg-gray-50 p-4">
-                    <input type="radio" name="payment" className="mt-1 h-4 w-4 text-[#111111]" defaultChecked />
+                  <label className="flex cursor-pointer items-start gap-4 rounded-lg border border-[#E5E5E3] p-4 hover:bg-gray-50 data-[active=true]:border-[#111111] data-[active=true]:bg-gray-50" data-active={paymentMethod === 'card'}>
+                    <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="mt-1 h-4 w-4 text-[#111111]" />
                     <div className="flex-1">
-                      <div className="font-semibold text-[#111111]">Credit/Debit Card</div>
-                      <div className="mt-4 grid gap-4">
-                        <Input placeholder="Card Number" />
-                        <div className="grid grid-cols-2 gap-4">
-                          <Input placeholder="MM/YY" />
-                          <Input placeholder="CVV" />
-                        </div>
-                      </div>
+                      <div className="font-semibold text-[#111111]">Credit/Debit Card (via Razorpay)</div>
                     </div>
                   </label>
 
                   {/* UPI Option */}
-                  <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#E5E5E3] p-4 hover:bg-gray-50">
-                    <input type="radio" name="payment" className="h-4 w-4" />
+                  <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#E5E5E3] p-4 hover:bg-gray-50 data-[active=true]:border-[#111111] data-[active=true]:bg-gray-50" data-active={paymentMethod === 'upi'}>
+                    <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4" />
                     <div className="font-semibold text-[#111111]">UPI (Google Pay, PhonePe, Paytm)</div>
                   </label>
                   
                   {/* COD Option */}
-                  <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#E5E5E3] p-4 hover:bg-gray-50">
-                    <input type="radio" name="payment" className="h-4 w-4" />
+                  <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-[#E5E5E3] p-4 hover:bg-gray-50 data-[active=true]:border-[#111111] data-[active=true]:bg-gray-50" data-active={paymentMethod === 'cod'}>
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4" />
                     <div className="font-semibold text-[#111111]">Cash on Delivery</div>
                   </label>
                 </div>
@@ -126,30 +226,23 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping Estimate</span>
-                  <span className="text-green-600 font-medium">Free Express Shipping</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax (18% GST incl.)</span>
-                  <span>₹{(subtotal * 0.18).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                  <span className="text-green-600 font-medium">{deliveryCharge === 0 ? 'Free Express Shipping' : `₹${deliveryCharge}`}</span>
                 </div>
                 
                 <div className="my-4 h-px w-full bg-[#E5E5E3]" />
                 
                 <div className="flex justify-between text-lg font-bold text-[#111111]">
                   <span>Total</span>
-                  <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                  <span>₹{total.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 
               <Button 
                 className="w-full mt-8 h-12 text-base shadow-md hover:shadow-lg transition-shadow"
-                onClick={() => {
-                  // Simulate order placement
-                  dispatch(clearCart())
-                  navigate('/order-success/ORD-892374')
-                }}
+                onClick={handlePlaceOrder}
+                disabled={loading || items.length === 0}
               >
-                Place Order Securely
+                {loading ? 'Processing...' : paymentMethod === 'cod' ? 'Place Order (COD)' : 'Pay & Place Order'}
               </Button>
               
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#5F5F5F]">

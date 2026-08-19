@@ -21,6 +21,8 @@ const env = {
   cloudinaryCloudName: optional('CLOUDINARY_CLOUD_NAME'),
   cloudinaryApiKey: optional('CLOUDINARY_API_KEY'),
   cloudinaryApiSecret: optional('CLOUDINARY_API_SECRET'),
+  razorpayKeyId: optional('RAZORPAY_KEY_ID', 'rzp_test_change_me'),
+  razorpayKeySecret: optional('RAZORPAY_KEY_SECRET', 'test_secret_change_me'),
   clientUrl: optional('CLIENT_URL', 'http://localhost:5173'),
   nodeEnv: optional('NODE_ENV', 'development'),
   isProd: optional('NODE_ENV') === 'production',

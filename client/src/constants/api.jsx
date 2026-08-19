@@ -63,6 +63,12 @@ export const API_ENDPOINTS = {
     CANCEL: (id) => `/orders/${id}/cancel`,
   },
 
+  // Payment
+  PAYMENT: {
+    CREATE_ORDER: '/payment/razorpay/create-order',
+    VERIFY: '/payment/razorpay/verify',
+  },
+
   // Addresses
   ADDRESSES: {
     LIST: '/users/addresses',
@@ -87,6 +93,8 @@ export const API_ENDPOINTS = {
     CREATE_CATEGORY: '/categories',
     UPDATE_CATEGORY: (id) => `/categories/${id}`,
     DELETE_CATEGORY: (id) => `/categories/${id}`,
+    ORDERS: '/orders/admin/all',
+    UPDATE_ORDER_STATUS: (id) => `/orders/admin/${id}/status`,
   },
 
   // Upload

@@ -155,3 +155,63 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     order
   })
 })
+
+// ============================================================
+// GET /api/orders/admin/all (ADMIN ONLY)
+// ============================================================
+export const getAllOrders = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 20, status } = req.query
+  const pageNum = Math.max(1, parseInt(page, 10))
+  const limitNum = Math.min(parseInt(limit, 10), 100)
+  const skip = (pageNum - 1) * limitNum
+
+  const filter = {}
+  if (status) filter.status = status
+
+  const [orders, total] = await Promise.all([
+    Order.find(filter)
+      .populate('user', 'name email phone')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .lean(),
+    Order.countDocuments(filter),
+  ])
+
+  res.json({
+    success: true,
+    orders,
+    total,
+    page: pageNum,
+    totalPages: Math.ceil(total / limitNum),
+  })
+})
+
+// ============================================================
+// PUT /api/orders/admin/:id/status (ADMIN ONLY)
+// ============================================================
+export const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { status, trackingNumber, carrier, notes } = req.body
+
+  const order = await Order.findById(req.params.id)
+  if (!order) {
+    throw new AppError('Order not found', 404)
+  }
+
+  if (status) order.status = status
+  if (trackingNumber !== undefined) order.trackingNumber = trackingNumber
+  if (carrier !== undefined) order.carrier = carrier
+  if (notes !== undefined) order.notes = notes
+
+  if (status === 'delivered') {
+    order.deliveredAt = Date.now()
+  }
+
+  await order.save()
+
+  res.json({
+    success: true,
+    message: 'Order status updated successfully',
+    order
+  })
+})

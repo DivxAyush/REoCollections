@@ -16,8 +16,9 @@ export default function AdminLayout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin-ayush2133k', icon: LayoutDashboard },
+    { name: 'Orders', path: '/admin-ayush2133k/orders', icon: PackageSearch },
     { name: 'Categories', path: '/admin-ayush2133k/categories', icon: Grid },
-    { name: 'Products', path: '/admin-ayush2133k/products', icon: PackageSearch },
+    { name: 'Products', path: '/admin-ayush2133k/products', icon: Store },
     { name: 'Add Product', path: '/admin-ayush2133k/add-product', icon: PlusCircle },
   ]
 
