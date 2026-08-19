@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import api from '@/config/api'
+import api from '@/services/apiClient'
 import { API_ENDPOINTS } from '@/constants/api'
 import { PageLoader } from '@/components/ui/Loader'
 import { format } from 'date-fns'
