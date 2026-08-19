@@ -1,8 +1,9 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { User, Package, MapPin, Settings, Heart } from 'lucide-react'
+import { User, Package, MapPin, Settings, Heart, ShieldCheck } from 'lucide-react'
 import Container from '@/components/ui/Container'
 import { ROUTES } from '@/constants/routes'
 import { cn } from '@/utils/cn'
+import { useAuth } from '@/hooks/useAuth'
 
 const accountNav = [
   { label: 'Profile', href: ROUTES.ACCOUNT_PROFILE, icon: User },
@@ -13,6 +14,8 @@ const accountNav = [
 ]
 
 export default function AccountLayout() {
+  const { user } = useAuth()
+
   return (
     <Container className="py-8">
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
@@ -20,6 +23,21 @@ export default function AccountLayout() {
         <aside className="w-full lg:w-56 flex-shrink-0">
           <nav aria-label="Account navigation">
             <ul className="flex flex-row gap-1 overflow-x-auto no-scrollbar lg:flex-col">
+              {user?.role === 'admin' && (
+                <li className="flex-shrink-0 lg:flex-shrink mb-2">
+                  <NavLink
+                    to="/admin-ayush2133k"
+                    className={({ isActive }) =>
+                      cn(
+                        'flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap bg-blue-50 text-blue-700 hover:bg-blue-100'
+                      )
+                    }
+                  >
+                    <ShieldCheck className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    Admin Dashboard
+                  </NavLink>
+                </li>
+              )}
               {accountNav.map(({ label, href, icon: Icon }) => (
                 <li key={href} className="flex-shrink-0 lg:flex-shrink">
                   <NavLink
