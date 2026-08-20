@@ -13,7 +13,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(false)
-  
+
   useEffect(() => {
     document.title = `Order Details — REo Collection`
     fetchOrderDetails()
@@ -81,12 +81,12 @@ export default function OrderDetailPage() {
             <p className="text-sm text-[#5F5F5F]">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
-        
+
         <div className={cn(
           "px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider",
           isCancelled ? "bg-red-100 text-red-600" :
-          orderStatus === 'delivered' ? "bg-green-100 text-green-600" :
-          "bg-blue-100 text-blue-600"
+            orderStatus === 'delivered' ? "bg-green-100 text-green-600" :
+              "bg-blue-100 text-blue-600"
         )}>
           {orderStatus.replace('_', ' ')}
         </div>
@@ -104,18 +104,18 @@ export default function OrderDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 flex flex-col gap-8">
-          
-// Need to add import { motion } from 'framer-motion' at the top, I will do it in a separate step or here if possible. Wait, the tool modifies a specific chunk.
+
+
           {/* Tracking Timeline */}
           {!isCancelled && (
             <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm overflow-hidden">
               <h2 className="text-lg font-bold text-[#111111] mb-6">Delivery Status</h2>
-              
+
               <div className="relative flex flex-col md:flex-row md:justify-between gap-8 md:gap-0 mt-2">
-                
+
                 {/* Mobile Vertical Lines */}
                 <div className="absolute left-[18px] top-5 bottom-5 w-1 bg-[#F7F7F6] -z-10 md:hidden" />
-                <motion.div 
+                <motion.div
                   className="absolute left-[18px] top-5 bottom-5 w-1 bg-green-500 -z-10 md:hidden origin-top"
                   initial={{ scaleY: 0 }}
                   animate={{ scaleY: (orderStatus === 'delivered' ? 1 : (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? 0.666 : (orderStatus === 'processing' || orderStatus === 'confirmed') ? 0.333 : 0) }}
@@ -124,7 +124,7 @@ export default function OrderDetailPage() {
 
                 {/* Desktop Horizontal Lines */}
                 <div className="hidden md:block absolute top-5 left-[48px] right-[48px] h-1 bg-[#F7F7F6] -z-10" />
-                <motion.div 
+                <motion.div
                   className="hidden md:block absolute top-5 left-[48px] right-[48px] h-1 bg-green-500 -z-10 origin-left"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: (orderStatus === 'delivered' ? 1 : (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? 0.666 : (orderStatus === 'processing' || orderStatus === 'confirmed') ? 0.333 : 0) }}
@@ -135,7 +135,7 @@ export default function OrderDetailPage() {
                   const Icon = step.icon
                   return (
                     <div key={step.title} className="flex flex-row md:flex-col items-start md:items-center gap-4 md:gap-2 md:w-24 relative z-0">
-                      <motion.div 
+                      <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.4, delay: index * 0.2 }}
@@ -146,7 +146,7 @@ export default function OrderDetailPage() {
                       >
                         <Icon className="h-4 w-4" />
                       </motion.div>
-                      <motion.div 
+                      <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: index * 0.2 + 0.1 }}
@@ -233,9 +233,9 @@ export default function OrderDetailPage() {
           </div>
 
           {(orderStatus === 'pending' || orderStatus === 'processing') && (
-            <Button 
-              variant="outline" 
-              className="w-full text-red-600 border-red-200 hover:bg-red-50" 
+            <Button
+              variant="outline"
+              className="w-full text-red-600 border-red-200 hover:bg-red-50"
               onClick={handleCancelOrder}
               disabled={cancelling}
             >
