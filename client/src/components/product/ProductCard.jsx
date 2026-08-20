@@ -1,13 +1,11 @@
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { buildRoute, ROUTES } from '@/constants/routes'
 import { useWishlist } from '@/hooks/useWishlist'
 import { useCart } from '@/hooks/useCart'
-import { useDispatch } from 'react-redux'
-import { addToast } from '@/redux/slices/uiSlice'
 import Badge from '@/components/ui/Badge'
 import PriceDisplay from '@/components/ui/PriceDisplay'
 import Rating from '@/components/ui/Rating'
@@ -17,12 +15,12 @@ import Rating from '@/components/ui/Rating'
 // ============================================================
 
 export default function ProductCard({ product, className = '' }) {
-  const dispatch = useDispatch()
   const { isWishlisted, toggle: toggleWishlist } = useWishlist()
   const { add: addToCart } = useCart()
 
   const [hovered, setHovered] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [sparking, setSparking] = useState(false)
 
   const wishlisted = isWishlisted(product._id)
 
@@ -34,15 +32,15 @@ export default function ProductCard({ product, className = '' }) {
     (e) => {
       e.preventDefault()
       e.stopPropagation()
+      
+      if (!wishlisted) {
+        setSparking(true)
+        setTimeout(() => setSparking(false), 800)
+      }
+      
       toggleWishlist(product._id)
-      dispatch(
-        addToast({
-          message: wishlisted ? 'Removed from wishlist' : 'Added to wishlist',
-          type: 'success',
-        })
-      )
     },
-    [dispatch, product._id, toggleWishlist, wishlisted]
+    [product._id, toggleWishlist, wishlisted]
   )
 
   const handleQuickAdd = useCallback(
@@ -50,14 +48,8 @@ export default function ProductCard({ product, className = '' }) {
       e.preventDefault()
       e.stopPropagation()
       addToCart(product, null, 1)
-      dispatch(
-        addToast({
-          message: `${product.name} added to cart`,
-          type: 'success',
-        })
-      )
     },
-    [addToCart, dispatch, product]
+    [addToCart, product]
   )
 
   const productUrl = buildRoute(ROUTES.PRODUCT, { slug: product.slug })
@@ -131,9 +123,29 @@ export default function ProductCard({ product, className = '' }) {
               wishlisted && 'opacity-100'
             )}
           >
+            <AnimatePresence>
+              {sparking && (
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  {[...Array(6)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1.5 h-1.5 bg-red-500 rounded-full"
+                      initial={{ scale: 0, x: 0, y: 0, opacity: 1 }}
+                      animate={{
+                        scale: [0, 1.2, 0],
+                        x: Math.cos((i * 60 * Math.PI) / 180) * 24,
+                        y: Math.sin((i * 60 * Math.PI) / 180) * 24,
+                        opacity: [1, 1, 0]
+                      }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  ))}
+                </div>
+              )}
+            </AnimatePresence>
             <Heart
               className={cn(
-                'h-4 w-4 transition-colors',
+                'h-4 w-4 transition-colors z-10',
                 wishlisted
                   ? 'fill-red-500 text-red-500'
                   : 'fill-none text-[#111111]'

@@ -253,7 +253,9 @@ export default function AdminAddBannerPage() {
                     <div className="flex flex-col items-center">
                       <UploadCloud className="h-10 w-10 text-slate-400 mb-2" />
                       <p className="text-sm font-medium text-slate-700">Click or drag image to upload</p>
-                      <p className="text-xs text-slate-500 mt-1">1920x1080 recommended</p>
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded-md">
+                        <p className="text-sm font-bold text-blue-700">Required Size: 1920 x 1080 pixels (16:9)</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -294,7 +296,9 @@ export default function AdminAddBannerPage() {
                     <div className="flex flex-col items-center">
                       <UploadCloud className="h-10 w-10 text-slate-400 mb-2" />
                       <p className="text-sm font-medium text-slate-700">Click or drag image to upload</p>
-                      <p className="text-xs text-slate-500 mt-1">1080x1920 recommended</p>
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded-md">
+                        <p className="text-sm font-bold text-blue-700">Required Size: 1080 x 1920 pixels (9:16)</p>
+                      </div>
                     </div>
                   )}
                 </div>

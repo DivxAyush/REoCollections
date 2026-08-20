@@ -97,6 +97,8 @@ export const API_ENDPOINTS = {
     UPDATE_ORDER_STATUS: (id) => `/orders/admin/${id}/status`,
     BANNERS: '/banners',
     BANNER_DETAIL: (id) => `/banners/${id}`,
+    INVENTORY: '/products/admin/inventory',
+    BULK_STOCK_UPDATE: '/products/admin/bulk-stock',
   },
 
   // Upload

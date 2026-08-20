@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { ArrowLeft, Package, Truck, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import PriceDisplay from '@/components/ui/PriceDisplay'
@@ -104,36 +105,56 @@ export default function OrderDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 flex flex-col gap-8">
           
+// Need to add import { motion } from 'framer-motion' at the top, I will do it in a separate step or here if possible. Wait, the tool modifies a specific chunk.
           {/* Tracking Timeline */}
           {!isCancelled && (
-            <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm overflow-hidden overflow-x-auto">
+            <div className="rounded-xl border border-[#E5E5E3] bg-white p-6 shadow-sm overflow-hidden">
               <h2 className="text-lg font-bold text-[#111111] mb-6">Delivery Status</h2>
-              <div className="relative flex justify-between min-w-[500px]">
-                {/* Connecting Line */}
-                <div className="absolute top-5 left-0 w-full h-1 bg-[#F7F7F6] -z-10" />
-                <div 
-                  className="absolute top-5 left-0 h-1 bg-green-500 -z-10 transition-all duration-500" 
-                  style={{ 
-                    width: orderStatus === 'delivered' ? '100%' : 
-                           (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? '66%' : 
-                           (orderStatus === 'processing' || orderStatus === 'confirmed') ? '33%' : '0%' 
-                  }} 
+              
+              <div className="relative flex flex-col md:flex-row md:justify-between gap-8 md:gap-0 mt-2">
+                
+                {/* Mobile Vertical Lines */}
+                <div className="absolute left-[18px] top-5 bottom-5 w-1 bg-[#F7F7F6] -z-10 md:hidden" />
+                <motion.div 
+                  className="absolute left-[18px] top-5 bottom-5 w-1 bg-green-500 -z-10 md:hidden origin-top"
+                  initial={{ scaleY: 0 }}
+                  animate={{ scaleY: (orderStatus === 'delivered' ? 1 : (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? 0.666 : (orderStatus === 'processing' || orderStatus === 'confirmed') ? 0.333 : 0) }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                />
+
+                {/* Desktop Horizontal Lines */}
+                <div className="hidden md:block absolute top-5 left-[48px] right-[48px] h-1 bg-[#F7F7F6] -z-10" />
+                <motion.div 
+                  className="hidden md:block absolute top-5 left-[48px] right-[48px] h-1 bg-green-500 -z-10 origin-left"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: (orderStatus === 'delivered' ? 1 : (orderStatus === 'shipped' || orderStatus === 'out_for_delivery') ? 0.666 : (orderStatus === 'processing' || orderStatus === 'confirmed') ? 0.333 : 0) }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
                 />
 
                 {timelineSteps.map((step, index) => {
                   const Icon = step.icon
                   return (
-                    <div key={step.title} className="flex flex-col items-center gap-2 w-24">
-                      <div className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full border-4 border-white transition-colors",
-                        step.completed ? "bg-green-500 text-white" : "bg-[#E5E5E3] text-[#5F5F5F]"
-                      )}>
+                    <div key={step.title} className="flex flex-row md:flex-col items-start md:items-center gap-4 md:gap-2 md:w-24 relative z-0">
+                      <motion.div 
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.4, delay: index * 0.2 }}
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white transition-colors shadow-sm",
+                          step.completed ? "bg-green-500 text-white" : "bg-[#E5E5E3] text-[#5F5F5F]"
+                        )}
+                      >
                         <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="text-center">
-                        <div className={cn("text-xs font-bold", step.completed ? "text-[#111111]" : "text-[#5F5F5F]")}>{step.title}</div>
-                        {step.date && <div className="text-[10px] text-[#5F5F5F] mt-1 break-words px-2">{step.date}</div>}
-                      </div>
+                      </motion.div>
+                      <motion.div 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.2 + 0.1 }}
+                        className="flex flex-col pt-1 md:pt-0 md:text-center"
+                      >
+                        <div className={cn("text-sm md:text-xs font-bold", step.completed ? "text-[#111111]" : "text-[#5F5F5F]")}>{step.title}</div>
+                        {step.date && <div className="text-xs md:text-[10px] text-[#5F5F5F] mt-0.5 break-words max-w-[200px] md:max-w-full">{step.date}</div>}
+                      </motion.div>
                     </div>
                   )
                 })}

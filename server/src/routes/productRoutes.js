@@ -10,6 +10,8 @@ import {
   updateProduct,
   deleteProduct,
   getProductsBatch,
+  getInventory,
+  bulkUpdateStock,
 } from '../controllers/productController.js'
 import { protect } from '../middleware/auth.js'
 import { adminOnly } from '../middleware/adminOnly.js'
@@ -25,6 +27,8 @@ router.get('/featured', getFeatured)
 router.get('/new-arrivals', getNewArrivals)
 router.get('/best-sellers', getBestSellers)
 router.post('/batch', getProductsBatch)
+router.get('/admin/inventory', protect, adminOnly, getInventory)
+router.patch('/admin/bulk-stock', protect, adminOnly, bulkUpdateStock)
 router.get('/:slug', getProductBySlug)
 
 export default router

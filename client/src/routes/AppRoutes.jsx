@@ -52,7 +52,7 @@ const LazyReturnPolicyPage = lazy(() => import('@/pages/policies/PolicyPages').t
 const LazyCookiePolicyPage = lazy(() => import('@/pages/policies/PolicyPages').then(m => ({ default: m.CookiePolicyPage })))
 
 // Admin
-const AdminLayout = lazy(() => import('@/layouts/AdminLayout'))
+import AdminLayout from '@/layouts/AdminLayout'
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'))
 const AdminAddProductPage = lazy(() => import('@/pages/admin/AdminAddProductPage'))
 const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage'))
@@ -62,6 +62,7 @@ const AdminOrdersPage = lazy(() => import('@/pages/admin/AdminOrdersPage'))
 const AdminOrderDetailsPage = lazy(() => import('@/pages/admin/AdminOrderDetailsPage'))
 const AdminBannersPage = lazy(() => import('@/pages/admin/AdminBannersPage'))
 const AdminAddBannerPage = lazy(() => import('@/pages/admin/AdminAddBannerPage'))
+const AdminInventoryPage = lazy(() => import('@/pages/admin/AdminInventoryPage'))
 
 // ============================================================
 // ROUTES
@@ -83,6 +84,8 @@ export default function AppRoutes() {
           <Route path="banners" element={<AdminBannersPage />} />
           <Route path="banners/add" element={<AdminAddBannerPage />} />
           <Route path="banners/edit/:id" element={<AdminAddBannerPage />} />
+          <Route path="inventory" element={<AdminInventoryPage />} />
+          <Route path="customers" element={<AdminDashboardPage />} />
         </Route>
 
         {/* Public routes with main layout */}

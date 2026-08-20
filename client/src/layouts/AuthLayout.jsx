@@ -1,5 +1,7 @@
 import { Outlet, Link } from 'react-router-dom'
+import { Suspense } from 'react'
 import { ROUTES } from '@/constants/routes'
+import { InlineLoader } from '@/components/ui/Loader'
 
 export default function AuthLayout() {
   return (
@@ -16,7 +18,9 @@ export default function AuthLayout() {
       {/* Auth content */}
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          <Outlet />
+          <Suspense fallback={<InlineLoader className="min-h-[30vh]" />}>
+            <Outlet />
+          </Suspense>
         </div>
       </main>
     </div>

@@ -301,3 +301,60 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   res.json({ success: true, message: 'Product deleted successfully' })
 })
+
+// ============================================================
+// GET /api/products/admin/inventory  — Stock overview for admin
+// ============================================================
+export const getInventory = asyncHandler(async (req, res) => {
+  const { search, category, stockFilter } = req.query
+
+  const query = {}
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { sku: { $regex: search, $options: 'i' } },
+    ]
+  }
+  if (category) query.category = category
+  if (stockFilter === 'out') query.stock = 0
+  else if (stockFilter === 'low') query.stock = { $gt: 0, $lte: 10 }
+  else if (stockFilter === 'in') query.stock = { $gt: 10 }
+
+  const products = await Product.find(query)
+    .select('name sku stock price category images isActive createdAt')
+    .populate('category', 'name slug')
+    .sort({ stock: 1, updatedAt: -1 })
+    .lean()
+
+  const summary = {
+    total: products.length,
+    outOfStock: products.filter((p) => p.stock === 0).length,
+    lowStock: products.filter((p) => p.stock > 0 && p.stock <= 10).length,
+    inStock: products.filter((p) => p.stock > 10).length,
+    totalValue: products.reduce((sum, p) => sum + p.price * p.stock, 0),
+  }
+
+  res.json({ success: true, products, summary })
+})
+
+// ============================================================
+// PATCH /api/products/admin/bulk-stock  — Bulk stock update
+// ============================================================
+export const bulkUpdateStock = asyncHandler(async (req, res) => {
+  const { updates } = req.body // [{ productId, stock }]
+
+  if (!Array.isArray(updates) || updates.length === 0) {
+    throw new AppError('updates array is required', 400)
+  }
+
+  const ops = updates.map(({ productId, stock }) => ({
+    updateOne: {
+      filter: { _id: productId },
+      update: { $set: { stock: Math.max(0, parseInt(stock, 10)) } },
+    },
+  }))
+
+  const result = await Product.bulkWrite(ops)
+
+  res.json({ success: true, modifiedCount: result.modifiedCount })
+})

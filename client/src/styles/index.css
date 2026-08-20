@@ -255,3 +255,53 @@ video {
   transform: translateY(0);
   transition: opacity 300ms ease, transform 300ms ease;
 }
+
+/* ============================================================
+   PRINT STYLES — REo Invoice
+   ============================================================ */
+@media print {
+  /* Hide everything except the invoice */
+  body > * { display: none !important; }
+
+  #reo-invoice {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 99999;
+    padding: 32px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12pt;
+    color: #111;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm 15mm;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+  }
+
+  thead tr {
+    background: #111 !important;
+    color: #fff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .bg-gray-50 {
+    background: #f8fafc !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

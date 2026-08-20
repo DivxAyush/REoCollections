@@ -1,6 +1,8 @@
 import { Outlet, NavLink } from 'react-router-dom'
+import { Suspense } from 'react'
 import { User, Package, MapPin, Settings, Heart, ShieldCheck } from 'lucide-react'
 import Container from '@/components/ui/Container'
+import { InlineLoader } from '@/components/ui/Loader'
 import { ROUTES } from '@/constants/routes'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/hooks/useAuth'
@@ -46,7 +48,7 @@ export default function AccountLayout() {
                       cn(
                         'flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap',
                         isActive
-                          ? 'bg-[#111111] text-white'
+                          ? 'bg-slate-900 !text-white'
                           : 'text-[#5F5F5F] hover:text-[#111111] hover:bg-[#F7F7F6]'
                       )
                     }
@@ -62,7 +64,9 @@ export default function AccountLayout() {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <Outlet />
+          <Suspense fallback={<InlineLoader className="min-h-[40vh]" />}>
+            <Outlet />
+          </Suspense>
         </div>
       </div>
     </Container>
