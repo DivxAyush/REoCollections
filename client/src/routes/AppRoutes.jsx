@@ -70,7 +70,7 @@ const AdminInventoryPage = lazy(() => import('@/pages/admin/AdminInventoryPage')
 
 export default function AppRoutes() {
   return (
-    <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={null}>
       <Routes>
         {/* Admin Routes */}
         <Route path="admin-ayush2133k" element={<AdminLayout />}>

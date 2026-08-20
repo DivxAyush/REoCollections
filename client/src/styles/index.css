@@ -305,3 +305,38 @@ video {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* ============================================================
+   ADMIN PANEL OVERRIDES
+   Prevent global brand styles from leaking into admin
+   ============================================================ */
+
+/* Admin font override — use Inter instead of Outfit */
+[style*="Inter"] {
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* Remove beige focus ring inside admin sidebar */
+aside a:focus-visible,
+aside button:focus-visible,
+nav a:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Admin scrollbar — neutral grey instead of brand beige */
+aside::-webkit-scrollbar,
+main::-webkit-scrollbar {
+  width: 4px;
+}
+
+aside::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 2px;
+}
+
+aside::-webkit-scrollbar-track,
+main::-webkit-scrollbar-track {
+  background: transparent;
+}

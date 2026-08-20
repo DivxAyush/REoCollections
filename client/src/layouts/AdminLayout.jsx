@@ -57,7 +57,7 @@ function NavItem({ item, collapsed }) {
       to={item.path}
       title={collapsed ? item.name : undefined}
       className={cn(
-        'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative',
+        'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative outline-none focus:outline-none',
         isActive
           ? 'bg-blue-600 text-white shadow-md shadow-blue-900/30'
           : 'text-slate-400 hover:bg-slate-800 hover:text-white'
@@ -84,7 +84,7 @@ export default function AdminLayout() {
   if (user?.role !== 'admin') return <Navigate to="/" replace />
 
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden font-['Inter']">
+    <div className="flex h-screen bg-slate-100 overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ── SIDEBAR ── */}
       <aside

@@ -2,9 +2,19 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/services/apiClient'
 import { API_ENDPOINTS } from '@/constants/api'
-import { UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
+import { UploadCloud, CheckCircle2, AlertCircle, X, ArrowLeft } from 'lucide-react'
+
+const FIELD = ({ label, required, children }) => (
+  <div>
+    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+      {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+    </label>
+    {children}
+  </div>
+)
+
+const INPUT_CLS = "w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400 transition-all"
+const SELECT_CLS = "w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none"
 
 export default function AdminAddProductPage() {
   const navigate = useNavigate()
@@ -12,307 +22,242 @@ export default function AdminAddProductPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
   const [categories, setCategories] = useState([])
-  
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await api.get(API_ENDPOINTS.CATEGORIES.LIST)
-        if (data.success) {
-          setCategories(data.categories.filter(c => c.isActive))
-        }
-      } catch (err) {
-        console.error('Failed to load categories', err)
-      }
-    }
-    fetchCategories()
-  }, [])
+  const [dragOver, setDragOver] = useState(false)
 
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    shortDescription: '',
-    price: '',
-    compareAtPrice: '',
-    category: '',
-    sku: '',
-    stock: '',
-    featured: false,
-    newArrival: false,
+    name: '', description: '', shortDescription: '',
+    price: '', compareAtPrice: '', category: '',
+    sku: '', stock: '', featured: false, newArrival: false, bestSeller: false,
   })
+
+  useEffect(() => {
+    api.get(API_ENDPOINTS.CATEGORIES.LIST).then((data) => {
+      if (data.success) setCategories(data.categories.filter((c) => c.isActive))
+    })
+  }, [])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }))
+    setFormData((p) => ({ ...p, [name]: type === 'checkbox' ? checked : value }))
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setImageFile(file)
-      setImagePreview(URL.createObjectURL(file))
-    }
+  const handleFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) return
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
   }
 
-  const handleUploadImage = async () => {
-    if (!imageFile) return null
-    
-    const formData = new FormData()
-    formData.append('image', imageFile)
-    
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragOver(false)
+    handleFile(e.dataTransfer.files[0])
+  }
+
+  const uploadImage = async () => {
+    const fd = new FormData()
+    fd.append('image', imageFile)
+    setUploadingImage(true)
     try {
-      setUploadingImage(true)
-      const data = await api.post(API_ENDPOINTS.UPLOAD, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      const data = await api.post(API_ENDPOINTS.UPLOAD, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
       return { url: data.url, publicId: data.publicId }
-    } catch (err) {
-      throw new Error('Image upload failed')
-    } finally {
-      setUploadingImage(false)
-    }
+    } finally { setUploadingImage(false) }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setSuccess(false)
-
+    if (!imageFile) { setError('Please select a product image'); return }
+    setLoading(true); setError(null); setSuccess(false)
     try {
-      let imageUrls = []
-      
-      // Upload image if selected
-      if (imageFile) {
-        const imageObj = await handleUploadImage()
-        if (imageObj) imageUrls.push(imageObj)
-      } else {
-        throw new Error('Please select at least one image')
-      }
-
-      // Convert numeric fields
+      const imageObj = await uploadImage()
       const payload = {
         ...formData,
         price: Number(formData.price),
         compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : undefined,
         stock: Number(formData.stock),
-        images: imageUrls,
+        images: [imageObj],
       }
-
       const data = await api.post(API_ENDPOINTS.ADMIN.CREATE_PRODUCT, payload)
-      if (data.success) {
-        setSuccess(true)
-        setTimeout(() => {
-          navigate('/admin-ayush2133k')
-        }, 2000)
-      }
+      if (data.success) { setSuccess(true); setTimeout(() => navigate('/admin-ayush2133k/products'), 1500) }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to create product')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Add New Product</h1>
-        <p className="text-slate-500 mt-1">Create a new product listing in the store</p>
+    <div className="p-4 md:p-6 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
+          <ArrowLeft size={16} />
+        </button>
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Add New Product</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Fill in the details to create a new product listing</p>
+        </div>
       </div>
 
+      {/* Alerts */}
       {success && (
-        <div className="bg-green-50 text-green-700 p-4 rounded-lg flex items-center gap-3">
-          <CheckCircle2 size={20} />
-          <p>Product created successfully! Redirecting...</p>
+        <div className="mb-4 flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+          <CheckCircle2 size={16} /> Product created! Redirecting...
         </div>
       )}
-
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg flex items-center gap-3">
-          <AlertCircle size={20} />
-          <p>{error}</p>
+        <div className="mb-4 flex items-center justify-between px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+          <span className="flex items-center gap-2"><AlertCircle size={16} />{error}</span>
+          <button onClick={() => setError(null)}><X size={14} /></button>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border shadow-sm space-y-6">
-        
-        {/* Main Details */}
-        <div className="space-y-4">
-          <h3 className="font-semibold text-slate-900 border-b pb-2">Basic Details</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Product Name"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="e.g. Classic White T-Shirt"
-            />
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Category</label>
-              <select
-                name="category"
-                required
-                className="w-full h-11 px-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
-                value={formData.category}
-                onChange={handleChange}
+      <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Row 1 — Two Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          {/* Left — Image Upload */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 h-full">
+              <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3">Product Image *</p>
+              
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-xl overflow-hidden transition-colors ${
+                  dragOver ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50'
+                }`}
+                style={{ aspectRatio: '3/4' }}
               >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
+                {imagePreview ? (
+                  <>
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => { setImageFile(null); setImagePreview('') }}
+                      className="absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/80"
+                    >
+                      <X size={12} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400">
+                    <UploadCloud size={32} className={dragOver ? 'text-blue-500' : ''} />
+                    <p className="text-xs font-medium text-center px-4">
+                      Drop image here or<br />
+                      <span className="text-blue-500">click to upload</span>
+                    </p>
+                    <p className="text-[10px] text-slate-400">JPG, PNG, WEBP • max 2MB</p>
+                  </div>
+                )}
+                <input
+                  type="file" accept="image/*"
+                  onChange={(e) => handleFile(e.target.files[0])}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
+
+              <p className="text-[10px] text-slate-400 mt-2 text-center">Recommended: 800×1000px (portrait)</p>
+            </div>
+          </div>
+
+          {/* Right — Details */}
+          <div className="lg:col-span-2 space-y-4">
+
+            {/* Basic Info */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-widest border-b pb-2">Basic Info</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <FIELD label="Product Name" required>
+                  <input name="name" required value={formData.name} onChange={handleChange}
+                    placeholder="e.g. Classic White T-Shirt" className={INPUT_CLS} />
+                </FIELD>
+                <FIELD label="Category" required>
+                  <div className="relative">
+                    <select name="category" required value={formData.category} onChange={handleChange} className={SELECT_CLS}>
+                      <option value="">Select category...</option>
+                      {categories.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
+                    </select>
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">▾</div>
+                  </div>
+                </FIELD>
+              </div>
+
+              <FIELD label="Short Description" required>
+                <textarea name="shortDescription" rows={2} required value={formData.shortDescription}
+                  onChange={handleChange} placeholder="Brief product tagline..."
+                  className={INPUT_CLS + ' resize-none'} />
+              </FIELD>
+
+              <FIELD label="Full Description" required>
+                <textarea name="description" rows={3} required value={formData.description}
+                  onChange={handleChange} placeholder="Detailed description, features, material..."
+                  className={INPUT_CLS + ' resize-none'} />
+              </FIELD>
+            </div>
+
+            {/* Pricing & Inventory */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-widest border-b pb-2">Pricing & Inventory</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <FIELD label="Price (₹)" required>
+                  <input type="number" name="price" min="0" required value={formData.price}
+                    onChange={handleChange} placeholder="0" className={INPUT_CLS} />
+                </FIELD>
+                <FIELD label="Compare Price (₹)">
+                  <input type="number" name="compareAtPrice" min="0" value={formData.compareAtPrice}
+                    onChange={handleChange} placeholder="0" className={INPUT_CLS} />
+                </FIELD>
+                <FIELD label="SKU" required>
+                  <input name="sku" required value={formData.sku}
+                    onChange={handleChange} placeholder="REO-001" className={INPUT_CLS} />
+                </FIELD>
+                <FIELD label="Stock Qty" required>
+                  <input type="number" name="stock" min="0" required value={formData.stock}
+                    onChange={handleChange} placeholder="0" className={INPUT_CLS} />
+                </FIELD>
+              </div>
+            </div>
+
+            {/* Visibility */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-widest border-b pb-2 mb-3">Visibility Flags</p>
+              <div className="flex flex-wrap gap-4">
+                {[
+                  { name: 'featured', label: '⭐ Featured' },
+                  { name: 'newArrival', label: '🆕 New Arrival' },
+                  { name: 'bestSeller', label: '🔥 Best Seller' },
+                ].map(({ name, label }) => (
+                  <label key={name} className="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" name={name} checked={formData[name]} onChange={handleChange}
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                    <span className="text-sm font-medium text-slate-700">{label}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Short Description</label>
-            <textarea
-              name="shortDescription"
-              required
-              rows={2}
-              className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
-              value={formData.shortDescription}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-slate-700">Full Description</label>
-            <textarea
-              name="description"
-              required
-              rows={4}
-              className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
-              value={formData.description}
-              onChange={handleChange}
-            />
           </div>
         </div>
 
-        {/* Pricing & Inventory */}
-        <div className="space-y-4 pt-4">
-          <h3 className="font-semibold text-slate-900 border-b pb-2">Pricing & Inventory</h3>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <Input
-              label="Price (₹)"
-              name="price"
-              type="number"
-              min="0"
-              required
-              value={formData.price}
-              onChange={handleChange}
-            />
-            <Input
-              label="Compare At Price (₹)"
-              name="compareAtPrice"
-              type="number"
-              min="0"
-              value={formData.compareAtPrice}
-              onChange={handleChange}
-            />
-            <Input
-              label="SKU"
-              name="sku"
-              required
-              value={formData.sku}
-              onChange={handleChange}
-            />
-            <Input
-              label="Stock Quantity"
-              name="stock"
-              type="number"
-              min="0"
-              required
-              value={formData.stock}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-
-        {/* Product Image */}
-        <div className="space-y-4 pt-4">
-          <h3 className="font-semibold text-slate-900 border-b pb-2">Product Image</h3>
-          
-          <div className="flex items-center gap-6">
-            <div className="shrink-0 w-32 h-40 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center bg-slate-50 relative overflow-hidden">
-              {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-              ) : (
-                <>
-                  <UploadCloud className="text-slate-400 mb-2" size={24} />
-                  <span className="text-xs text-slate-500 font-medium">Upload Image</span>
-                </>
-              )}
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </div>
-            <div className="text-sm text-slate-500">
-              <p className="font-medium text-slate-700 mb-1">Upload primary product image</p>
-              <p>Recommended size: 800x1000px</p>
-              <p>Max file size: 2MB</p>
-              <p>Formats: JPG, PNG, WEBP</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Options */}
-        <div className="space-y-4 pt-4">
-          <h3 className="font-semibold text-slate-900 border-b pb-2">Visibility Options</h3>
-          
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name="featured"
-                checked={formData.featured}
-                onChange={handleChange}
-                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-slate-700">Featured Product</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name="newArrival"
-                checked={formData.newArrival}
-                onChange={handleChange}
-                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-slate-700">New Arrival</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <div className="pt-6 border-t flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/admin-ayush2133k')}
-          >
+        {/* Submit Bar */}
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onClick={() => navigate(-1)}
+            className="px-5 py-2 text-sm font-medium border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
             Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={loading || uploadingImage || !imageFile}
-          >
-            {loading || uploadingImage ? 'Creating...' : 'Create Product'}
-          </Button>
+          </button>
+          <button type="submit" disabled={loading || uploadingImage || !imageFile}
+            className="px-6 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+            {(loading || uploadingImage) && (
+              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {loading ? 'Creating...' : uploadingImage ? 'Uploading...' : 'Create Product'}
+          </button>
         </div>
 
       </form>
