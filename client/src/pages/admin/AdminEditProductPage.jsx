@@ -135,7 +135,7 @@ export default function AdminEditProductPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Edit Product</h1>
         <p className="text-slate-500 mt-1">Update existing product listing</p>

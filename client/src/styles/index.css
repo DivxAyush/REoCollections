@@ -332,7 +332,7 @@ main::-webkit-scrollbar {
 
 aside::-webkit-scrollbar-thumb,
 main::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #2563eb;
   border-radius: 2px;
 }
 

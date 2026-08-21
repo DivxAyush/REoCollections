@@ -59,8 +59,8 @@ function NavItem({ item, collapsed }) {
       className={cn(
         'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative outline-none focus:outline-none',
         isActive
-          ? 'bg-blue-600 text-white shadow-md shadow-blue-900/30'
-          : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          ? 'bg-blue-600 !text-white shadow-md shadow-blue-900/30'
+          : 'text-slate-300 hover:bg-slate-800 hover:!text-white'
       )}
     >
       {isActive && (
@@ -68,7 +68,7 @@ function NavItem({ item, collapsed }) {
       )}
       <item.icon
         size={18}
-        className={cn('shrink-0', isActive ? 'text-white' : 'text-slate-400 group-hover:text-white')}
+        className={cn('shrink-0', isActive ? '!text-white' : 'text-slate-300 group-hover:!text-white')}
       />
       {!collapsed && <span className="truncate">{item.name}</span>}
     </NavLink>
@@ -114,7 +114,7 @@ export default function AdminLayout() {
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
               {!collapsed && (
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 mb-2">
                   {group.label}
                 </p>
               )}
