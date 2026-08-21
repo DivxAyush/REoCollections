@@ -49,20 +49,37 @@ export default function HomePage() {
                 <Link
                   key={category._id}
                   to={`/shop/${category.slug}`}
-                  className="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-xl bg-[#F7F7F6]"
+                  className="group relative flex aspect-[4/5] flex-col overflow-hidden rounded-2xl bg-[#F7F7F6] shadow-sm hover:shadow-2xl transition-all duration-500"
                 >
-                  {category.image?.url && (
+                  {category.image?.url ? (
                     <img
                       src={category.image.url}
                       alt={category.name}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300" />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="relative mt-auto p-4 sm:p-6 text-center w-full">
-                    <h3 className="text-lg font-bold text-white sm:text-xl">
-                      {category.name}
-                    </h3>
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  
+                  <div className="relative mt-auto p-5 sm:p-6 flex flex-col items-center justify-end w-full h-full text-center">
+                    <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                      <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide mb-1">
+                        {category.name}
+                      </h3>
+                      {category.description && (
+                        <p className="text-sm sm:text-base text-white/80 font-medium mb-3">
+                          {category.description}
+                        </p>
+                      )}
+                      
+                      <div className="overflow-hidden flex justify-center mt-2">
+                        <span className="inline-block text-xs font-bold text-white uppercase tracking-widest border-b-2 border-transparent group-hover:border-white pb-1 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-full group-hover:translate-y-0">
+                          Shop Now
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))}

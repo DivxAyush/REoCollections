@@ -29,7 +29,20 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const query = { isActive: true }
 
-  if (category) query.category = category
+  if (category) {
+    if (mongoose.Types.ObjectId.isValid(category)) {
+      query.category = category
+    } else {
+      // If it's a slug, we need to look it up first
+      const foundCategory = await Category.findOne({ slug: category })
+      if (foundCategory) {
+        query.category = foundCategory._id
+      } else {
+        // If slug not found, ensure query returns nothing (or handle appropriately)
+        query.category = new mongoose.Types.ObjectId() // fake id so it returns []
+      }
+    }
+  }
   if (featured === 'true') query.featured = true
   if (newArrival === 'true') query.newArrival = true
   if (bestSeller === 'true') query.bestSeller = true
@@ -213,6 +226,8 @@ export const createProduct = asyncHandler(async (req, res) => {
     stock,
     featured,
     newArrival,
+    sizes,
+    colors,
   } = req.body
 
   // Handle Category ID or Slug
@@ -245,6 +260,8 @@ export const createProduct = asyncHandler(async (req, res) => {
     stock,
     featured,
     newArrival,
+    sizes,
+    colors,
   })
 
   res.status(201).json({ success: true, product })

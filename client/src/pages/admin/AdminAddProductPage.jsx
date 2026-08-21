@@ -31,6 +31,7 @@ export default function AdminAddProductPage() {
     name: '', description: '', shortDescription: '',
     price: '', compareAtPrice: '', category: '',
     sku: '', stock: '', featured: false, newArrival: false, bestSeller: false,
+    sizes: '', colors: '',
   })
 
   useEffect(() => {
@@ -76,6 +77,8 @@ export default function AdminAddProductPage() {
         price: Number(formData.price),
         compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : undefined,
         stock: Number(formData.stock),
+        sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [],
+        colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : [],
         images: [imageObj],
       }
       const data = await api.post(API_ENDPOINTS.ADMIN.CREATE_PRODUCT, payload)
@@ -217,6 +220,21 @@ export default function AdminAddProductPage() {
                 <FIELD label="Stock Qty" required>
                   <input type="number" name="stock" min="0" required value={formData.stock}
                     onChange={handleChange} placeholder="0" className={INPUT_CLS} />
+                </FIELD>
+              </div>
+            </div>
+
+            {/* Options (Sizes & Colors) */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-widest border-b pb-2">Options (Variants)</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <FIELD label="Sizes (Comma separated)">
+                  <input name="sizes" value={formData.sizes}
+                    onChange={handleChange} placeholder="e.g. S, M, L, XL" className={INPUT_CLS} />
+                </FIELD>
+                <FIELD label="Colors (Comma separated)">
+                  <input name="colors" value={formData.colors}
+                    onChange={handleChange} placeholder="e.g. Red, Blue, Black" className={INPUT_CLS} />
                 </FIELD>
               </div>
             </div>

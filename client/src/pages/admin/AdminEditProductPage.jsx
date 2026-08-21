@@ -28,6 +28,8 @@ export default function AdminEditProductPage() {
     stock: '',
     featured: false,
     newArrival: false,
+    sizes: '',
+    colors: '',
   })
 
   useEffect(() => {
@@ -46,6 +48,8 @@ export default function AdminEditProductPage() {
           stock: product.stock,
           featured: product.featured,
           newArrival: product.newArrival,
+          sizes: product.sizes ? product.sizes.join(', ') : '',
+          colors: product.colors ? product.colors.join(', ') : '',
         })
         if (product.images && product.images.length > 0) {
           setImagePreview(product.images[0].url)
@@ -111,6 +115,8 @@ export default function AdminEditProductPage() {
         price: Number(formData.price),
         compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : undefined,
         stock: Number(formData.stock),
+        sizes: formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [],
+        colors: formData.colors ? formData.colors.split(',').map(c => c.trim()).filter(Boolean) : [],
         images: imageUrls.length > 0 ? imageUrls : undefined,
       }
 
@@ -245,6 +251,28 @@ export default function AdminEditProductPage() {
               required
               value={formData.stock}
               onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Options (Sizes & Colors) */}
+        <div className="space-y-4 pt-4">
+          <h3 className="font-semibold text-slate-900 border-b pb-2">Options (Variants)</h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Sizes (Comma separated)"
+              name="sizes"
+              value={formData.sizes}
+              onChange={handleChange}
+              placeholder="e.g. S, M, L, XL"
+            />
+            <Input
+              label="Colors (Comma separated)"
+              name="colors"
+              value={formData.colors}
+              onChange={handleChange}
+              placeholder="e.g. Red, Blue, Black"
             />
           </div>
         </div>
