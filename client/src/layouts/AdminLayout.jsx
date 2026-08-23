@@ -5,7 +5,7 @@ import { InlineLoader } from '@/components/ui/Loader'
 import {
   LayoutDashboard, ShoppingBag, Grid3x3, Store, PlusCircle,
   Tag, ImagePlay, LogOut, ChevronLeft, ChevronRight,
-  Package, Warehouse, Users, BarChart3, Settings,
+  Package, Warehouse, Users, BarChart3, Settings, ShieldCheck
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
@@ -39,9 +39,10 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: 'Users',
+    label: 'Users & Access',
     items: [
       { name: 'Customers', path: '/admin-ayush2133k/customers', icon: Users },
+      { name: 'Roles & Permissions', path: '/admin-ayush2133k/roles', icon: ShieldCheck, roles: ['super_admin'] },
     ],
   },
 ]
@@ -80,8 +81,26 @@ export default function AdminLayout() {
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
 
-  if (!isAuthenticated) return <Navigate to="/login" state={{ from: location }} replace />
-  if (user?.role !== 'admin') return <Navigate to="/" replace />
+  if (!isAuthenticated) return <Navigate to="/admin" state={{ from: location }} replace />
+  if (!['admin', 'super_admin', 'helper'].includes(user?.role)) return <Navigate to="/" replace />
+
+  // Filter navigation based on role
+  const filteredNavGroups = NAV_GROUPS.map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      // Helper specific logic: Helpers only get Products, Add Product, Banners
+      if (user.role === 'helper') {
+        return ['Products', 'Add Product', 'Banners'].includes(item.name)
+      }
+      
+      // For Admin/SuperAdmin, check specific role restrictions
+      if (item.roles && !item.roles.includes(user.role)) {
+        return false
+      }
+      
+      return true
+    })
+  })).filter(group => group.items.length > 0) // Remove empty groups
 
   return (
     <div className="flex h-screen bg-slate-100 overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -111,7 +130,7 @@ export default function AdminLayout() {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 space-y-5">
-          {NAV_GROUPS.map((group) => (
+          {filteredNavGroups.map((group) => (
             <div key={group.label}>
               {!collapsed && (
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 mb-2">

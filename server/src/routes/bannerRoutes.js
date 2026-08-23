@@ -7,19 +7,19 @@ import {
   deleteBanner,
 } from '../controllers/bannerController.js'
 import { protect } from '../middleware/auth.js'
-import { adminOnly } from '../middleware/adminOnly.js'
+import { staffOnly } from '../middleware/adminOnly.js'
 
 const router = Router()
 
 router
   .route('/')
-  .get(protect, adminOnly, getAdminBanners)
-  .post(protect, adminOnly, createBanner)
+  .get(protect, staffOnly, getAdminBanners)
+  .post(protect, staffOnly, createBanner)
 
 router
   .route('/:id')
-  .get(protect, adminOnly, getBannerById)
-  .put(protect, adminOnly, updateBanner)
-  .delete(protect, adminOnly, deleteBanner)
+  .get(protect, staffOnly, getBannerById)
+  .put(protect, staffOnly, updateBanner)
+  .delete(protect, staffOnly, deleteBanner)
 
 export default router

@@ -16,7 +16,7 @@ const loginSchema = z.object({
 })
 
 export default function LoginPage() {
-  const { login, isLoading, error, isAuthenticated, dismissError } = useAuth()
+  const { login, isLoading, error, isAuthenticated, dismissError, user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const returnTo = location.state?.from || ROUTES.ACCOUNT
@@ -27,10 +27,15 @@ export default function LoginPage() {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(returnTo, { replace: true })
+    if (isAuthenticated && user) {
+      if (['admin', 'super_admin', 'helper'].includes(user.role)) {
+        logout()
+        navigate('/admin', { replace: true, state: { error: 'Please login through the admin portal.' } })
+      } else {
+        navigate(returnTo, { replace: true })
+      }
     }
-  }, [isAuthenticated, navigate, returnTo])
+  }, [isAuthenticated, user, navigate, returnTo, logout])
 
   const {
     register,

@@ -14,21 +14,21 @@ import {
   bulkUpdateStock,
 } from '../controllers/productController.js'
 import { protect } from '../middleware/auth.js'
-import { adminOnly } from '../middleware/adminOnly.js'
+import { staffOnly } from '../middleware/adminOnly.js'
 
 const router = Router()
 
 router.get('/', getProducts)
-router.post('/', protect, adminOnly, createProduct)
-router.put('/:id', protect, adminOnly, updateProduct)
-router.delete('/:id', protect, adminOnly, deleteProduct)
+router.post('/', protect, staffOnly, createProduct)
+router.put('/:id', protect, staffOnly, updateProduct)
+router.delete('/:id', protect, staffOnly, deleteProduct)
 router.get('/search', searchProducts)
 router.get('/featured', getFeatured)
 router.get('/new-arrivals', getNewArrivals)
 router.get('/best-sellers', getBestSellers)
 router.post('/batch', getProductsBatch)
-router.get('/admin/inventory', protect, adminOnly, getInventory)
-router.patch('/admin/bulk-stock', protect, adminOnly, bulkUpdateStock)
+router.get('/admin/inventory', protect, staffOnly, getInventory)
+router.patch('/admin/bulk-stock', protect, staffOnly, bulkUpdateStock)
 router.get('/:slug', getProductBySlug)
 
 export default router

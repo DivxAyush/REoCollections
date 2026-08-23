@@ -3,7 +3,7 @@ import multer from 'multer'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import cloudinary from '../config/cloudinary.js'
 import { protect } from '../middleware/auth.js'
-import { adminOnly } from '../middleware/adminOnly.js'
+import { staffOnly } from '../middleware/adminOnly.js'
 
 const router = Router()
 
@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage })
 
 // Upload a single image, returns the Cloudinary URL and public_id
-router.post('/', protect, adminOnly, upload.single('image'), (req, res) => {
+router.post('/', protect, staffOnly, upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: 'No file uploaded' })
   }

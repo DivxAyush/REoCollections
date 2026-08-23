@@ -6,7 +6,7 @@ import {
   deleteCategory,
 } from '../controllers/categoryController.js'
 import { protect } from '../middleware/auth.js'
-import { adminOnly } from '../middleware/adminOnly.js'
+import { staffOnly } from '../middleware/adminOnly.js'
 
 const router = Router()
 
@@ -14,7 +14,7 @@ const router = Router()
 router.get('/', getCategories)
 
 // Admin only
-router.use(protect, adminOnly)
+router.use(protect, staffOnly)
 router.post('/', createCategory)
 router.put('/:id', updateCategory)
 router.delete('/:id', deleteCategory)
