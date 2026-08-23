@@ -25,7 +25,7 @@ export default function AccountLayout() {
         <aside className="w-full lg:w-56 flex-shrink-0">
           <nav aria-label="Account navigation">
             <ul className="flex flex-row gap-1 overflow-x-auto no-scrollbar lg:flex-col">
-              {user?.role === 'admin' && (
+              {['admin', 'super_admin', 'helper'].includes(user?.role) && (
                 <li className="flex-shrink-0 lg:flex-shrink mb-2">
                   <NavLink
                     to="/admin-ayush2133k"
