@@ -1,6 +1,6 @@
 import Skeleton from '@/components/ui/Skeleton'
 import { cn } from '@/utils/cn'
-
+//ayush
 export default function BannerSkeleton({ type = 'hero', className = '' }) {
   const isHero = type === 'hero'
 
